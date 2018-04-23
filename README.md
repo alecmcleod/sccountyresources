@@ -1,5 +1,6 @@
 # Santa Cruz County Resources `README`
-#### Contributors: Kobe Hu <hzhanhua@ucsc.edu>, Alec McLeod, Paul May, Isaac Avram
+#### Contributors: Zhanhua Hu <hzhanhua@ucsc.edu>, Alec McLeod <aimcleod@ucsc.edu>,
+##### Paul May<pwmay@ucsc.edu>, Isaac Avram<iavram@ucsc.edu>
 ---
 
 ![](https://www.ticketsnipers.com/assets/images/article/Santa_Cruz.png)

@@ -3,7 +3,7 @@ Contributor guidelines for developers
 * Author headers at the beginning of each class file. For example,
 ```
 """
-    Author: Charlie Sheen
+    Author: XXX XXX
     Created for SCCR, 2018
 """
 ```

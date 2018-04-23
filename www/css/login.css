@@ -1,4 +1,4 @@
-/* Author: Kobe Hu
+/* Author: Zhanhua Hu
  * Created for SCCR, 2018
  */
 
