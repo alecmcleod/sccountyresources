@@ -15,7 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import include
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+]
+
+urlpatterns += [
+    path('calendar/', include('sccalendar.urls')),
+    path('addressbook/', include('addressbook.urls')),
+    #Redirects index to ./calendar    
+    path('', RedirectView.as_view(url='/calendar/')),
+    
 ]
