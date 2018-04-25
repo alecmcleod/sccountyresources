@@ -2,5 +2,11 @@
 <h1>Home page</h1>
 
 <p>We've got content baby!</p>
+<p>Here it is, the next ten events on the calendar!</p>
+<ul>
+{% for event in eventsSimple %}
+<li>{{event}}</li>
+{% endfor %}
+</ul>
 
 {% endblock %}
