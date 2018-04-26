@@ -3,7 +3,7 @@
 ##### Paul May<pwmay@ucsc.edu>, Isaac Avram<iavram@ucsc.edu>
 ---
 
-![](https://www.ticketsnipers.com/assets/images/article/Santa_Cruz.png)
+<img src="https://www.ticketsnipers.com/assets/images/article/Santa_Cruz.png" height=500x />
 
 ## Purpose
 ---
