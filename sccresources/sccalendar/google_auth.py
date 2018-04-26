@@ -1,7 +1,6 @@
 from __future__ import print_function
 from google.oauth2 import service_account
-from apiclient.discovery import build
-
+from googleapiclient.discovery import build
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 SERVICE_ACCOUNT_FILE = 'sccalendar/servicekey.json'
