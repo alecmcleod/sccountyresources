@@ -1,8 +1,6 @@
 from __future__ import print_function
 from google.oauth2 import service_account
 from apiclient.discovery import build
-from httplib2 import Http
-from oauth2client import file, client, tools
 
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -13,7 +11,8 @@ credentials = service_account.Credentials.from_service_account_file(
 
 service = build('calendar', 'v3', credentials=credentials)
 
-def getService():
+
+def get_service():
     return service
 
 
