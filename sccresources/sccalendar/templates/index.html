@@ -5,7 +5,7 @@
 <p>Here it is, the next ten events on the calendar!</p>
 <ul>
 {% for event in eventsSimple %}
-<li>{{event}}</li>
+<li>{{event.0}} , {{event.1}} <a href=http://localhost:8000/calendar/details/{{event.2}}>Details Link</a></li>
 {% endfor %}
 </ul>
 
