@@ -1,20 +1,9 @@
 {% extends "base_generic.html" %} {% block content %}
 <h1>Home page</h1>
 
-<p>We've got content baby!</p>
-<p>Here it is, the next ten events on the calendar!</p>
-
-<form action="/calendar/" method="get">
+<form action="/calendar/search" method="get">
     {{form}}
     <input type="submit" value="Submit"/>
 </form>
-
-<p>{{output_text}}</p>
-
-<ul>
-{% for event in eventsSimple %}
-<li>{{event.0}} , {{event.1}} <a href=http://localhost:8000/calendar/details/{{event.2}}>Details Link</a></li>
-{% endfor %}
-</ul>
 
 {% endblock %}
