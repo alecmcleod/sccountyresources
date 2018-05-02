@@ -1,11 +1,24 @@
 from django.shortcuts import render
 from . import google_auth
 import datetime
+from .forms import SearchForm
 
 # Create your views here.
 
 
 def index(request):
+
+    if request.method == 'GET':
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            output_text = request.GET.get('your_name')
+        else:
+            output_text = 'Invalid input'
+
+    else:
+        form = SearchForm()
+        output_text = ''
+
     now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
     # Retrieve next ten events starting from now from the linked google calendar
     events_result = google_auth.get_service().events().list(calendarId='hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com', timeMin=now,
@@ -21,7 +34,7 @@ def index(request):
         request,
         'index.html',
         #passes the contents of the brackets to the template
-        context={'eventsSimple':eventsSimple},
+        context={'eventsSimple': eventsSimple, 'form': form, 'output_text': output_text},
     )
 
 def details(request , event_id=None):
@@ -73,7 +86,7 @@ def details(request , event_id=None):
 
 
     return render(request,'details.html',context={'title':title,
-'location':location,'description':text,'date':date,'time':time,'tags':tags})
+        'location':location,'description':text,'date':date,'time':time,'tags': tags})
 
 
 
