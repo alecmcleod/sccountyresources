@@ -33,8 +33,6 @@ def search(request):
     else:
         now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
         tomorrow = (datetime.combine(datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
-        print(now)
-        print(tomorrow)
         if request.GET.get('services') == 'DRUGS':
             service = 'DRUGS'
             events_today = google_auth.get_service().events().list(
