@@ -27,5 +27,4 @@ urlpatterns += [
     path('addressbook/', include('addressbook.urls')),
     #Redirects index to ./calendar    
     path('', RedirectView.as_view(url='/calendar/')),
-    
 ]

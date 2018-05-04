@@ -3,7 +3,8 @@
 ##### Paul May<pwmay@ucsc.edu>, Isaac Avram<iavram@ucsc.edu>
 ---
 
-<img src="https://www.ticketsnipers.com/assets/images/article/Santa_Cruz.png" height=500x />
+
+<!-- <img src="https://www.ticketsnipers.com/assets/images/article/Santa_Cruz.png" height=500x /> -->
 
 ## Purpose
 ---
@@ -24,3 +25,5 @@ you with the soonest open soup kitchen or food bank near your location.
 * General troubleshooting
 * Outlook for the next version
 * Running list of `TODO` items and coding style guide (*for developers*)
+* team work agreement
+

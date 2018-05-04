@@ -1,0 +1,71 @@
+{% extends "base_generic.html" %} {% block content %}
+<!--Author: Paul May-->
+<!--Based off of Start Bootstrap: Blog Post-->
+    <!-- Page Content -->
+    <div class="container">
+    	<style>
+			#tag{
+    			background-color: #3CB371;
+    			color: white;
+    			padding: 8px;
+    			text-align: center;
+    			border-radius: 8px;
+    			text-decoration: none;
+   				display: inline-block;
+    			font-size: 14px;
+    			margin: 4px 2px;
+			}
+		</style>
+
+         <!-- Title -->
+          <h1 class="sm-4">{{title}}</h1>
+          <hr>
+
+
+          <div class = row>
+           <!-- Add tag search links for these when that url structure is finalized -->
+           <!-- make searchable , make auto generate tags based on current location -->
+              {% for tag in tags%}
+              <button id="tag">
+              {{tag}}
+              </button>
+              {% endfor %}
+          </div>
+
+          <hr>
+
+          <div class=container>
+
+          <!-- Post Content -->
+
+          <div class=row style =  margin: auto;width: 80%; padding: 10px;'>
+
+          	<div class=col-sm-6 >
+         	 <div>
+         	 	 <h2>{{date}} , {{time}}</h2>
+         	 	 <h3> Place </h3>
+         	 </div>
+         	 <br>
+         	 <p>{{description}}</p>
+
+      		</div>
+
+      		<div class=col-sm-6>
+      		<iframe
+  				width="300"
+  				height="300"
+  				frameborder="0" style="border:0"
+  				src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB1HeCPIzq6B7l9F4FhAGelK3-L0WtFNyk
+    			&q={{location}}" allowfullscreen>
+				</iframe>
+      			<br>
+      			<br>
+      			<button type="button" class="btn btn-primary">export to ical</button>
+      			<button type="button" class="btn btn-primary">export to google calendars</button>
+      		</div>
+
+      </div>
+
+
+
+{% endblock %}

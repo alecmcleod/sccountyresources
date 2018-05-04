@@ -1,0 +1,68 @@
+/* Author: Zhanhua Hu
+ * Created for SCCR, 2018
+ */
+
+/* Importing miscellaneous fonts to be used
+ */
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+@import url('https://fonts.googleapis.com/css?family=Arvo');
+
+.modal {
+
+    overflow-y: scroll;
+}
+
+/* Customizing the "brand" header in the navbar
+ */
+.navbar-brand
+{
+    font-family: 'Pacifico', cursive;
+}
+
+/* Font styling for all other items on the navbar
+ */
+.navbar-collapse
+{
+    font-family: 'Arvo', serif;
+}
+
+/* Make the given font color a "rainbow" color using some CSS magic
+ */
+.rainbow
+{
+    background-image: -webkit-gradient( linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22) );
+    background-image: gradient( linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22) );
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* General header styling
+ */
+#header
+{
+    font-family: 'Arvo', serif;
+    font-size: 30px;
+}
+
+/* Styling for the form
+ */
+#contact
+{
+    /* position: absolute;
+    top: 200%; */
+    font-family: 'Arvo', serif;
+}
+
+#tag
+{
+		background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+}
