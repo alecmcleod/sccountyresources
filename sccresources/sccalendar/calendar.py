@@ -66,8 +66,7 @@ class GoogleCalendar:
             i_event.add("summary",      event["summary"])
             i_event.add("description",  event.get("description"))
             i_event.add("uid",          event["iCalUID"])
-            i_event.add("dtstart",      event["start"]["dateTime"])
-            i_event.add("dtend",        event["end"]["dateTime"])
+            i_event.add("tuple",        (event["start"]["dateTime"], event["end"]["dateTime"]))
             
             if event.get("reccurence"):
                 i_event.add("sequence", event["sequence"])
