@@ -25,3 +25,5 @@ you with the soonest open soup kitchen or food bank near your location.
 * General troubleshooting
 * Outlook for the next version
 * Running list of `TODO` items and coding style guide (*for developers*)
+* team work agreement
+
