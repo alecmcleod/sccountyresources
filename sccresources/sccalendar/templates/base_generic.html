@@ -20,7 +20,7 @@
 
   <div class="container">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#"><span class="rainbow">Santa Cruz County Resources</span></a>
+      <a class="navbar-brand" href="#"><span>Santa Cruz County Resources</span></a>
       <a class="navbar-brand" href="#">
         {% load static %}
         <img src="{% static 'img/Santa_Cruz_County.png' %}" width="8%" height="8%"></img>
@@ -44,12 +44,13 @@
     </nav>
 
     <div class="container mb-5" id="header">
-        <div class="row" id="header">
+        <div  id="header">
           <div class="col-md text-center mb-2 mt-5">
             {% block content %} {% endblock %}
           </div>
         </div>
     </div>
+   <div class="card-footer sm-transparent border-success text-center">© 2018 Santa Cruz County Resources</div>
 
   <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
