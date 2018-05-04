@@ -2,7 +2,7 @@
 #### Contributors: Zhanhua Hu <hzhanhua@ucsc.edu>, Alec McLeod <aimcleod@ucsc.edu>,
 ##### Paul May<pwmay@ucsc.edu>, Isaac Avram<iavram@ucsc.edu>
 ---
-<img src="{% static 'img/Santa_Cruz_County.png' %}" width="8%" height="8%"></img>
+
 
 <!-- <img src="https://www.ticketsnipers.com/assets/images/article/Santa_Cruz.png" height=500x /> -->
 
