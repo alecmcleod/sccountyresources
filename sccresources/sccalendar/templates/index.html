@@ -1,10 +1,27 @@
+<!--
+    Author: Zhanhua Hu
+    Created for SCCR, 2018
+-->
+<!--
+    Jinja that extends this class from the base_generic HTML file
+-->
 {% extends "base_generic.html" %} {% block content %}
+<!--
+    Header welcoming the client/user to the website
+-->
 <h1 class="mt-5 mb-5">Welcome to Santa Cruz Country Resources!</h1>
+<!--
+    On a GET request instantiated by the client, the Jinja will auto-fill based
+    on the code in `urls.py`.
+-->
 <form action="/calendar/search" method="get">
   {{form}}
   <input type="submit" value="Submit" />
 </form>
 
+<!--
+    "About card" telling about the cause
+-->
 <div id="about" class="container mt-5 mb-5">
   <div class="card w-100">
     <div class="card-body">
@@ -16,34 +33,55 @@
   </div>
 </div>
 
+<!--
+    The contact form, with multiple rows indicating the Name, Phone number, Email address, Subject, and Message
+-->
 <div id="contact" class="container">
   <p class="text-center mt-5" id="header">Contact form</p>
   <form>
+      <!--
+          Row in the HTML form indicating the username
+      -->
     <div class="form-group row">
       <label for="form-name">Name</label>
       <input type="text" class="form-control" id="form-name" aria-describedby="userName" placeholder="Enter name">
       <small id="userName" class="form-text text-muted">Please enter your full name.</small>
     </div>
+    <!--
+        Row in the HTML form indicating the phone number
+    -->
     <div class="form-group row">
       <label for="inputNumber">Phone number</label>
       <input type="text" class="form-control" id="inputNumber" aria-describedby="phoneNum" placeholder="(XXX)-XXX-XXXX">
       <small id="inputNumber" class="form-text text-muted">Please enter your phone number. We'll never share your phone number with anyone else.</small>
     </div>
+    <!--
+        Row in the HTML form indicating the email
+    -->
     <div class="form-group row">
       <label for="inputEmail">Email address</label>
       <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" placeholder="Enter email">
       <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
     </div>
+    <!--
+        Row in the HTML form indicating the subject
+    -->
     <div class="form-group row">
       <label for="subjectMsg">Subject</label>
       <input type="text" class="form-control" id="subjectMsg" aria-describedby="subMsg" placeholder="Subject title">
       <small id="subMsg" class="form-text text-muted">Please enter the subject matter.</small>
     </div>
+    <!--
+        Row in the HTML form indicating the message
+    -->
     <div class="form-group row">
       <label for="msgBody">Message</label>
       <input type="text" class="form-control" id="msgBody" aria-describedby="usrMsg" placeholder="Enter your message here">
       <small id="usrMsg" class="form-text text-muted">Please enter your message. All inquiries are confidential.</small>
     </div>
+    <!--
+        Centered button to submit the fields in the form, as filled out by the user
+    -->
     <div class="text-center pb-5">
       <button type="submit" class="btn btn-outline-success my-2 my-sm-0">Submit</button>
     </div>
