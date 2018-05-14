@@ -20,6 +20,8 @@ origins = ['603 Laguna St Santa Cruz']
 destinations = ['UCSC']
 print(gmaps.distance_matrix(origins, destinations))
 
+print('test')
+
 # Create your views here.
 def index(request):
 
