@@ -4,6 +4,7 @@ from . import google_auth
 from datetime import datetime, time, timedelta
 from .forms import SearchForm
 import calendar
+import googlemaps
 
 
 # Calendar ID variables
@@ -12,6 +13,12 @@ DRUG_CAL = 'nu02uodssn6j0ij4o3l4rqv9dk@group.calendar.google.com'
 HEALTH_CAL = 'vlqtpo7ig0mbvpmk91j8r736kk@group.calendar.google.com'
 SHOWER_CAL = 'uk8elskt37v991sbe3k7qasu1k@group.calendar.google.com'
 
+# Google maps variable
+gmaps = googlemaps.Client(key='AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
+
+origins = ['603 Laguna St Santa Cruz']
+destinations = ['UCSC']
+print(gmaps.distance_matrix(origins, destinations))
 
 # Create your views here.
 def index(request):
@@ -28,14 +35,11 @@ def index(request):
 
 def search(request):
 
-    # If there are no search parameters, redirect to home page
-    if not request.GET.get('services'):
-        return HttpResponseRedirect('/')
-    else:
+    # Perform the get request to google api for the appropriate service and location
+    def get_results():
         now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
         tomorrow = (datetime.combine(datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
         if request.GET.get('services') == 'DRUGS':
-            service = 'DRUGS'
             events_today = google_auth.get_service().events().list(
                 calendarId=DRUG_CAL,
                 timeMin=now,
@@ -43,7 +47,6 @@ def search(request):
                 singleEvents=True,
                 orderBy='startTime').execute()
         elif request.GET.get('services') == 'FOOD':
-            service = 'FOOD'
             events_today = google_auth.get_service().events().list(
                 calendarId=FOOD_CAL,
                 timeMin=now,
@@ -51,7 +54,6 @@ def search(request):
                 singleEvents=True,
                 orderBy='startTime').execute()
         elif request.GET.get('services') == 'HEALTH':
-            service = 'HEALTH'
             events_today = google_auth.get_service().events().list(
                 calendarId=HEALTH_CAL,
                 timeMin=now,
@@ -59,7 +61,6 @@ def search(request):
                 singleEvents=True,
                 orderBy='startTime').execute()
         elif request.GET.get('services') == 'SHOWER':
-            service = 'SHOWER'
             events_today = google_auth.get_service().events().list(
                 calendarId=SHOWER_CAL,
                 timeMin=now,
@@ -68,12 +69,17 @@ def search(request):
                 orderBy='startTime').execute()
         else:
             return render(request, '404.html')
+        return events_today
 
-        events = events_today.get('items', [])
+    # If there are no search parameters, redirect to home page
+    if not request.GET.get('services'):
+        return HttpResponseRedirect('/')
+    else:
+        events = get_results().get('items', [])
         return render(
             request,
             'search.html',
-            context={'events': events, 'service': service}
+            context={'events': events, 'service': request.GET.get('services')}
         )
 
 
