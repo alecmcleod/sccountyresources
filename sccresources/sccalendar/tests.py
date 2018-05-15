@@ -10,5 +10,6 @@ class GoogleCalendarTestCase(TestCase):
 
     def test_export_calendar(self):
         c = GoogleCalendar(self.service, self.calendar_id)
+        ical = c.export_ical()
 
-        print(c.export_ical())
+        self.assertEquals(len(ical.subcomponents), 5)

@@ -215,11 +215,3 @@ def details(request, service=None, event_id=None):
                                                     'time': event_time,
                                                     'recurrence':recurrence
                                                     })
-
-
-
-
-
-
-
-
