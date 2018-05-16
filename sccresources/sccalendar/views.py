@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from . import google_auth
 from datetime import datetime, time, timedelta
-from .calendar import GoogleCalendar
+from .google_calendar import GoogleCalendar
 from .forms import SearchForm
 from .utils import to_sent
+
 import calendar
 import googlemaps
 
@@ -14,6 +15,8 @@ FOOD_CAL    = GoogleCalendar(google_auth.get_service(), 'hv4cl31tra0t7l0ggbfrev6
 DRUG_CAL    = GoogleCalendar(google_auth.get_service(), 'nu02uodssn6j0ij4o3l4rqv9dk@group.calendar.google.com')
 HEALTH_CAL  = GoogleCalendar(google_auth.get_service(), 'vlqtpo7ig0mbvpmk91j8r736kk@group.calendar.google.com')
 SHOWER_CAL  = GoogleCalendar(google_auth.get_service(), 'uk8elskt37v991sbe3k7qasu1k@group.calendar.google.com')
+# Maps keywords to Calendar variables
+var_map = {"DRUGS": DRUG_CAL, "FOOD": FOOD_CAL, "HEALTH": HEALTH_CAL, "SHOWER": SHOWER_CAL}
 
 # Google maps variable
 gmaps = googlemaps.Client(key='AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
@@ -41,15 +44,14 @@ def search(request):
     now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
     tomorrow = (datetime.combine(datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
     api_params = {'timeMin': now, 'timeMax': tomorrow, 'singleEvents': True, 'orderBy': "startTime"}
-    var_map = {"DRUGS": DRUG_CAL, "FOOD": FOOD_CAL, "HEALTH": HEALTH_CAL, "SHOWER": SHOWER_CAL}
 
     services = request.GET.get('services')
-    if services not in var_map:
-        # Requested service doesn't exist
-        return render(request, '404.html')
-    elif services is None:
+    if services is None:
         # If there are no search parameters, redirect to home page
         return HttpResponseRedirect('/')
+    elif services is None:
+        # Requested service doesn't exist
+        return render(request, '404.html')
     else:
         events_today = list(var_map[services].get_events(**api_params))
 
@@ -82,7 +84,7 @@ def details(request, service=None, event_id=None):
                     elif parse[0]  is 'BYDAY':
                         parse = 'on' + to_sent(parse[1])
                     elif parse[0]  is 'UNTIL':
-                        parse = 'until' + calendar.month_name(int(parse[1][5:6])) + ',' + parse[1][7:]
+                        parse = 'until' + calendar.month_name[int(parse[1][5:6])] + ',' + parse[1][7:]
                     else:
                         break
             out_string += ("this event occurs " + parse)
@@ -98,14 +100,8 @@ def details(request, service=None, event_id=None):
         else:
             return str( int(military_list[0]) ) + ':' + military_list[1] + " A.M."
 
-    if service == 'DRUGS':
-        event = google_auth.get_service().events().get(calendarId=DRUG_CAL, eventId=event_id).execute()
-    elif service == 'FOOD':
-        event = google_auth.get_service().events().get(calendarId=FOOD_CAL, eventId=event_id).execute()
-    elif service == 'HEALTH':
-        event = google_auth.get_service().events().get(calendarId=HEALTH_CAL, eventId=event_id).execute()
-    elif service == 'SHOWER':
-        event = google_auth.get_service().events().get(calendarId=DRUG_CAL, eventId=event_id).execute()
+    if service in var_map:
+        event = var_map[service].get_event(event_id)
     else:
         return render(request, '404.html')
 
