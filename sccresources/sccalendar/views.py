@@ -90,7 +90,7 @@ def details(request, service=None, event_id=None):
     '''Details: returns a response with all event info'''
     '''         pretaining to an event with id 'event_id' '''
 
-    def parse_recurrance(rec_list):
+    def parse_recurrence(rec_list):
         '''arguments: standard google calendars list of recurrance strings'''
         '''output : an english string describing when an event recurrs'''
         keys = ['FREQ','COUNT','INTERVAL','BYDAY','UNTIL']
@@ -141,7 +141,7 @@ def details(request, service=None, event_id=None):
 
     title = event.get('summary', '')
     try:
-        recurrence = parse_recurrance(event['recurrence'])
+        recurrence = parse_recurrence(event['recurrence'])
     except KeyError:
         recurrence = ''
 
