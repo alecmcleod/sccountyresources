@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from . import google_auth
 from datetime import datetime, time, timedelta
 from .forms import SearchForm
+from .utils import to_sent
 import calendar
 import googlemaps
 
@@ -33,7 +34,6 @@ def index(request):
         # Passes the contents of the brackets to the template
         context={'form': form},
     )
-
 
 def search(request):
 
@@ -115,25 +115,6 @@ def details(request, service=None, event_id=None):
             out_string += ("this event occurs " + parse)
         return out_string
 
-    def to_sent(abbrv_string):
-        '''to_sent: input: a comma seperate string of day abbreviations
-                    output: an english sentence enumerating those days'''
-        abbrv_dict = {'MO':'Monday','TU':'Tuesday','WE':'Wednesday'
-        ,'TH':'Thursday','FR':'Friday','SA':'Saturday','SU':'Sunday'}
-        
-        abbrv_list = abbrv_string.split(',')
-        
-        length = len(abbrv_list)-1
-        
-        sent = ' '
-
-        for i  in range(length):
-           sent += abbrv_dict[abbrv_list[i]]
-
-        sent += ("and " + abbrv_dict[length+1])
-
-        return sent
-
 
     def to_standard(military_string):
         '''to_standard: converts military time to standard and adds meridean'''
@@ -171,7 +152,7 @@ def details(request, service=None, event_id=None):
     event_date = event['start'].get('dateTime', '')
     event_time = event['start'].get('date', '')
 
-    elif '-' in event_time:
+    if '-' in event_time:
         ed_list = event_time.split('-')
         ed_list[2] = ed_list[2].split('T')[0] 
         event_time = calendar.month_name[int(ed_list[1])] + ' , ' + ed_list[2] + ' , ' + ed_list[0]
