@@ -2,7 +2,7 @@ import tempfile
 import os
 from sys import platform
 
-from .calendar import GoogleCalendar
+from .google_calendar import GoogleCalendar
 from .utils import to_sent
 
 from .google_auth import get_service
