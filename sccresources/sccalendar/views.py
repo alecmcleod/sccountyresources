@@ -4,7 +4,7 @@ from . import google_auth
 from datetime import datetime, time, timedelta
 from .google_calendar import GoogleCalendar
 from .forms import SearchForm
-from .utils import to_sent
+from .utils import to_sent, parse_recurrence, to_standard
 
 import calendar
 import googlemaps
@@ -64,41 +64,6 @@ def search(request):
 def details(request, service=None, event_id=None):
     '''Details: returns a response with all event info'''
     '''         pretaining to an event with id 'event_id' '''
-
-    def parse_recurrence(rec_list):
-        '''arguments: standard google calendars list of recurrance strings'''
-        '''output : an english string describing when an event recurrs'''
-        keys = ['FREQ','COUNT','INTERVAL','BYDAY','UNTIL']
-        parse = ''
-        out_string = ''
-        for rule in rec_list:
-            for key in keys:
-                if key in rule:
-                    parse = rule.split('=')
-                    if parse[0] is 'FREQ':
-                        parse = parse[1].lower() + ', '
-                    elif parse[0]  is 'COUNT':
-                        parse = ''
-                    elif parse[0]  is 'INTERVAL':
-                        parse = ''
-                    elif parse[0]  is 'BYDAY':
-                        parse = 'on' + to_sent(parse[1])
-                    elif parse[0]  is 'UNTIL':
-                        parse = 'until' + calendar.month_name[int(parse[1][5:6])] + ',' + parse[1][7:]
-                    else:
-                        break
-            out_string += ("this event occurs " + parse)
-        return out_string
-
-
-    def to_standard(military_string):
-        '''to_standard: converts military time to standard and adds meridean'''
-
-        military_list = military_string.split(':')
-        if int(military_list[0]) > 12:
-            return str( int(military_list[0])-12 ) + ':' + military_list[1] + " P.M."
-        else:
-            return str( int(military_list[0]) ) + ':' + military_list[1] + " A.M."
 
     if service in var_map:
         event = var_map[service].get_event(event_id)
