@@ -2,11 +2,37 @@
 Package for working with Google Calendar and iCal
 """
 from . import google_auth
+from .utils import parse_recurrence
 from datetime import datetime
 from typing import Generator
 from icalendar import Calendar, Event
 from googleapiclient.discovery import Resource
 from pyrfc3339 import parse
+
+class GoogleEvent():
+    """
+    Represents an event on a google calendar
+
+    Properties:
+    id - String representing the event id
+    summary - String containting the summary of the event (title)
+    location - A string containing the location of the event
+    description - A string containing the description of the event
+    start_datetime - A datetime object containing the start date and time of the event
+    end_datetime - A datetime object containing the end date and time of the event
+    reccurence - A textual representation of the days the event reccurers on.
+    """
+    def __init__(self, event):
+        self.id = event.get("id")
+        self.summary = event.get("summary")
+        self.location = event.get("location")
+        self.description = event.get("description")
+        self.start_datetime = parse(event["start"].get("dateTime"))
+        self.end_datetime = parse(event["end"].get("dateTime"))
+
+        self.reccurence = event.get("reccurence")
+        if self.reccurence is not None:
+            self.reccurence = parse_recurrence(self.reccurence)
 
 class GoogleCalendar:
     """
@@ -40,11 +66,11 @@ class GoogleCalendar:
     def __repr__(self):
         return "GoogleCalendar(" + self.service + ", " + self.calendar_id + ")"
     
-    def get_event(self, event_id, **api_params):
+    def get_event(self, event_id, **api_params) -> GoogleEvent:
         """
         Returns an event by it's id
         """
-        return self.service.events().get(calendarId=self.calendar_id, eventId=event_id, **api_params).execute()
+        return GoogleEvent(self.service.events().get(calendarId=self.calendar_id, eventId=event_id, **api_params).execute())
 
     def get_events(self, **api_params) -> Generator[dict, None, None]:
         """
