@@ -141,10 +141,8 @@ def details(request, service=None, event_id=None):
 
     title = event.get('summary', '')
     try:
-        recurrence = event[recurrence]
-        recurrence = parse_recurrance(recurrence)
-        print(recurrence)
-    except:
+        recurrence = parse_recurrance(event['recurrence'])
+    except KeyError:
         recurrence = ''
 
     location = event.get('location', '1515 Ocean St, Santa Cruz, CA 95060')
