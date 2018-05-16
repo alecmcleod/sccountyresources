@@ -40,6 +40,12 @@ class GoogleCalendar:
     def __repr__(self):
         return "GoogleCalendar(" + self.service + ", " + self.calendar_id + ")"
     
+    def get_event(self, event_id, **api_params):
+        """
+        Returns an event by it's id
+        """
+        return self.service.events().get(calendarId=self.calendar_id, eventId=event_id, **api_params).execute()
+
     def get_events(self, **api_params) -> Generator[dict, None, None]:
         """
         Returns a generator that can be used to iterate over all the events in the calendar.
