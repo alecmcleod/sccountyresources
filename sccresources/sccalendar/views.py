@@ -158,38 +158,19 @@ def details(request, service=None, event_id=None):
     if not event:
         return render(request, '404.html')
 
-    title = event.get('summary')
+    title = event.get('summary', '')
     try:
         recurrence = event[recurrence]
         recurrence = parse_recurrance(recurrence)
         print(recurrence)
     except:
-        recurrence = None
-
-    location = event.get('location')
-    text = event.get('description')
-    event_date = event['start'].get('dateTime')
-    event_time = event['start'].get('date')
-
-    #if block which replaces the default values with empty strings
-
-    if text is None:
-        text = ''
-
-    if title is None:
-        title = ''
-
-    if location is None:
-        location = '1515 Ocean St, Santa Cruz, CA 95060'
-
-    if text is None:
-        text = ''
-
-    if recurrence is None:
         recurrence = ''
 
-    if event_time is None:
-        event_time = ''
+    location = event.get('location', '1515 Ocean St, Santa Cruz, CA 95060')
+    text = event.get('description', '')
+    event_date = event['start'].get('dateTime', '')
+    event_time = event['start'].get('date', '')
+
     elif '-' in event_time:
         ed_list = event_time.split('-')
         ed_list[2] = ed_list[2].split('T')[0] 
@@ -201,9 +182,7 @@ def details(request, service=None, event_id=None):
     #the time as the date or the date as the time. this is to fix monkey
     #problems.
 
-    if event_date is None:
-        event_date = ''
-    else:
+    if event_date is not '':
         ed_list = event_date.split('-')
         ed_list[2] = ed_list[2].split('T')[0] 
         event_date = calendar.month_name[int(ed_list[1])] + ' , ' + ed_list[2] + ' , ' + ed_list[0]
