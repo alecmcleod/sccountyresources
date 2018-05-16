@@ -2,9 +2,11 @@
 Package for working with Google Calendar and iCal
 """
 from . import google_auth
+from datetime import datetime
 from typing import Generator
 from icalendar import Calendar, Event
 from googleapiclient.discovery import Resource
+from pyrfc3339 import parse
 
 class GoogleCalendar:
     """
@@ -66,7 +68,8 @@ class GoogleCalendar:
             i_event.add("summary",      event["summary"])
             i_event.add("description",  event.get("description"))
             i_event.add("uid",          event["iCalUID"])
-            i_event.add("tuple",        (event["start"]["dateTime"], event["end"]["dateTime"]))
+            i_event.add("dtstart",      parse(event["start"]["dateTime"]))
+            i_event.add("dtend",        parse(event["end"]["dateTime"]))
             
             if event.get("reccurence"):
                 i_event.add("sequence", event["sequence"])
@@ -74,6 +77,6 @@ class GoogleCalendar:
                     prop_name, v = i.split(":", max_split=1)
                     i_event[prop_name] = v
 
-            cal.add_component(event)
+            cal.add_component(i_event)
         
         return cal

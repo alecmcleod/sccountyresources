@@ -1,10 +1,27 @@
+<!--
+    Author: Zhanhua Hu
+    Created for SCCR, 2018
+-->
+<!--
+    Jinja that extends this class from the base_generic HTML file
+-->
 {% extends "base_generic.html" %} {% block content %}
+<!--
+    Header welcoming the client/user to the website
+-->
 <h1 class="mt-5 mb-5">Welcome to Santa Cruz Country Resources!</h1>
+<!--
+    On a GET request instantiated by the client, the Jinja will auto-fill based
+    on the code in `urls.py`.
+-->
 <form action="/calendar/search" method="get">
   {{form}}
   <input type="submit" value="Submit" />
 </form>
 
+<!--
+    "About card" telling about the cause
+-->
 <div id="about" class="container mt-5 mb-5">
   <div class="card w-100">
     <div class="card-body">
@@ -16,38 +33,12 @@
   </div>
 </div>
 
-<div id="contact" class="container">
-  <p class="text-center mt-5" id="header">Contact form</p>
-  <form>
-    <div class="form-group row">
-      <label for="form-name">Name</label>
-      <input type="text" class="form-control" id="form-name" aria-describedby="userName" placeholder="Enter name">
-      <small id="userName" class="form-text text-muted">Please enter your full name.</small>
-    </div>
-    <div class="form-group row">
-      <label for="inputNumber">Phone number</label>
-      <input type="text" class="form-control" id="inputNumber" aria-describedby="phoneNum" placeholder="(XXX)-XXX-XXXX">
-      <small id="inputNumber" class="form-text text-muted">Please enter your phone number. We'll never share your phone number with anyone else.</small>
-    </div>
-    <div class="form-group row">
-      <label for="inputEmail">Email address</label>
-      <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" placeholder="Enter email">
-      <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-    </div>
-    <div class="form-group row">
-      <label for="subjectMsg">Subject</label>
-      <input type="text" class="form-control" id="subjectMsg" aria-describedby="subMsg" placeholder="Subject title">
-      <small id="subMsg" class="form-text text-muted">Please enter the subject matter.</small>
-    </div>
-    <div class="form-group row">
-      <label for="msgBody">Message</label>
-      <input type="text" class="form-control" id="msgBody" aria-describedby="usrMsg" placeholder="Enter your message here">
-      <small id="usrMsg" class="form-text text-muted">Please enter your message. All inquiries are confidential.</small>
-    </div>
-    <div class="text-center pb-5">
-      <button type="submit" class="btn btn-outline-success my-2 my-sm-0">Submit</button>
-    </div>
-  </form>
+<!--
+    The contact form, with multiple rows indicating the Name, Phone number, Email address, Subject, and Message
+-->
+<div id="calendar" class="container">
+  <p class="text-center mt-5" id="header">Calendar</p>
 </div>
+<iframe src="https://calendar.google.com/calendar/embed?mode=WEEK&amp;height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=hv4cl31tra0t7l0ggbfrev6tes%40group.calendar.google.com&amp;color=%230F4B38&amp;ctz=America%2FLos_Angeles" style="border-width:0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
 </div>
 {% endblock %}
