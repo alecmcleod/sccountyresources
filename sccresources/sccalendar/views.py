@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from . import google_auth
 from datetime import datetime, time, timedelta
+from .calendar import GoogleCalendar
 from .forms import SearchForm
 from .utils import to_sent
 import calendar
@@ -9,10 +10,10 @@ import googlemaps
 
 
 # Calendar ID variables
-FOOD_CAL = 'hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com'
-DRUG_CAL = 'nu02uodssn6j0ij4o3l4rqv9dk@group.calendar.google.com'
-HEALTH_CAL = 'vlqtpo7ig0mbvpmk91j8r736kk@group.calendar.google.com'
-SHOWER_CAL = 'uk8elskt37v991sbe3k7qasu1k@group.calendar.google.com'
+FOOD_CAL    = GoogleCalendar(google_auth.get_service(), 'hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com')
+DRUG_CAL    = GoogleCalendar(google_auth.get_service(), 'nu02uodssn6j0ij4o3l4rqv9dk@group.calendar.google.com')
+HEALTH_CAL  = GoogleCalendar(google_auth.get_service(), 'vlqtpo7ig0mbvpmk91j8r736kk@group.calendar.google.com')
+SHOWER_CAL  = GoogleCalendar(google_auth.get_service(), 'uk8elskt37v991sbe3k7qasu1k@group.calendar.google.com')
 
 # Google maps variable
 gmaps = googlemaps.Client(key='AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
@@ -36,55 +37,27 @@ def index(request):
     )
 
 def search(request):
-
     # Perform the get request to google api for the appropriate service and location
-    def get_results():
-        now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
-        tomorrow = (datetime.combine(datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
-        if request.GET.get('services') == 'DRUGS':
-            events_today = google_auth.get_service().events().list(
-                calendarId=DRUG_CAL,
-                timeMin=now,
-                timeMax=tomorrow,
-                singleEvents=True,
-                orderBy='startTime').execute()
-        elif request.GET.get('services') == 'FOOD':
-            events_today = google_auth.get_service().events().list(
-                calendarId=FOOD_CAL,
-                timeMin=now,
-                timeMax=tomorrow,
-                singleEvents=True,
-                orderBy='startTime').execute()
-        elif request.GET.get('services') == 'HEALTH':
-            events_today = google_auth.get_service().events().list(
-                calendarId=HEALTH_CAL,
-                timeMin=now,
-                timeMax=tomorrow,
-                singleEvents=True,
-                orderBy='startTime').execute()
-        elif request.GET.get('services') == 'SHOWER':
-            events_today = google_auth.get_service().events().list(
-                calendarId=SHOWER_CAL,
-                timeMin=now,
-                timeMax=tomorrow,
-                singleEvents=True,
-                orderBy='startTime').execute()
-        else:
-            return render(request, '404.html')
-        return events_today
+    now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
+    tomorrow = (datetime.combine(datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
+    api_params = {'timeMin': now, 'timeMax': tomorrow, 'singleEvents': True, 'orderBy': "startTime"}
+    var_map = {"DRUGS": DRUG_CAL, "FOOD": FOOD_CAL, "HEALTH": HEALTH_CAL, "SHOWER": SHOWER_CAL}
 
-    # If there are no search parameters, redirect to home page
-    if not request.GET.get('services'):
+    services = request.GET.get('services')
+    if services not in var_map:
+        # Requested service doesn't exist
+        return render(request, '404.html')
+    elif services is None:
+        # If there are no search parameters, redirect to home page
         return HttpResponseRedirect('/')
     else:
-        events = get_results().get('items', [])
-        return render(
-            request,
-            'search.html',
-            context={'events': events, 'service': request.GET.get('services')}
-        )
+        events_today = list(var_map[services].get_events(**api_params))
 
-
+    return render(
+        request,
+        'search.html',
+        context={'events': events_today, 'service': request.GET.get('services')}
+    )
 
 def details(request, service=None, event_id=None):
     '''Details: returns a response with all event info'''
