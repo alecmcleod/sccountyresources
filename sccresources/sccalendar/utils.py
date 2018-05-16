@@ -4,15 +4,9 @@ def to_sent(abbrv_string):
     abbrv_dict = {'MO': 'Monday', 'TU': 'Tuesday', 'WE': 'Wednesday',
                   'TH': 'Thursday', 'FR': 'Friday', 'SA': 'Saturday', 'SU': 'Sunday'}
 
-    abbrv_list = abbrv_string.split(',')
+    abbrv_list = abbrv_string.split(",")
 
-    length = len(abbrv_list)-1
+    sent = [abbrv_dict[x] + ", " for x in abbrv_list[:-1]]
+    sent.append("and " + abbrv_dict[abbrv_list[-1]])
 
-    sent = ' '
-
-    for i in range(length):
-        sent += abbrv_dict[abbrv_list[i]]
-
-    sent += ("and " + abbrv_dict[length+1])
-
-    return sent
+    return "".join(sent)

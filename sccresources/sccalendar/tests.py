@@ -1,7 +1,10 @@
 import tempfile
 import os
 from sys import platform
+
 from .calendar import GoogleCalendar
+from .utils import to_sent
+
 from .google_auth import get_service
 from django.test import TestCase
 # Create your tests here.
@@ -25,9 +28,10 @@ class GoogleCalendarTestCase(TestCase):
         f.close()
         print("Created test artifact " + path)
 
-        if platform == "darwin":
-            # Open the ical file on OSX
-            os.system("open " + path)
-        elif platform == "win32":
-            # Open the ical file on Windows
-            os.system("start " + path)
+
+class UtilsTestCase(TestCase):
+    def test_to_sent(self):
+        actual = to_sent("MO,TU,WE,TH,FR,SA,SU")
+        expected = "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, and Sunday"
+
+        self.assertEqual(actual, expected)
