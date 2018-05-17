@@ -22,6 +22,7 @@ var_map = {"DRUGS": DRUG_CAL, "FOOD": FOOD_CAL, "HEALTH": HEALTH_CAL, "SHOWER": 
 # Google maps variable
 gmaps = GoogleMaps('AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
 
+
 # Create your views here.
 def index(request):
 
@@ -45,7 +46,7 @@ def search(request):
         # the key defines what value is used to sort by in the event dictionaries. If it is missing it will return none
         def event_key(event):
             missing_distance = (event.get('distance_value') is None)
-            return (missing_distance, event.get('distance_value') if not missing_distance else None)
+            return missing_distance, event.get('distance_value') if not missing_distance else None
         list.sort(events, key=event_key)
 
     def add_distance(events):
@@ -88,9 +89,11 @@ def search(request):
         context={'events': events_today, 'service': request.GET.get('services')}
     )
 
+
 def details(request, service=None, event_id=None):
-    '''Details: returns a response with all event info'''
-    '''         pretaining to an event with id 'event_id' '''
+    """
+    Renders the detail page for a given event id
+    """
 
     if service in var_map:
         google_event_params = {
