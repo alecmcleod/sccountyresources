@@ -49,12 +49,12 @@ def search(request):
     if services is None:
         # If there are no search parameters, redirect to home page
         return HttpResponseRedirect('/')
-    elif services is None:
+    elif services not in var_map:
         # Requested service doesn't exist
         return render(request, '404.html')
     else:
         events_today = list(var_map[services].get_events(**api_params))
-
+        
     return render(
         request,
         'search.html',
