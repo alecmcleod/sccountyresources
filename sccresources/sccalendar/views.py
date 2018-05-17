@@ -60,11 +60,15 @@ def search(request):
             api_params = {'origins': [request.GET.get('locations')],
                           'destinations': [event.get('location')],
                           'units': 'imperial'}
-            resp = gmaps.get_distance(**api_params)
-            # If request is successful, assign the appropriate values in each event dict
-            if resp['Success'] == 'OK':
-                event['distance_text'] = resp['distance_text']
-                event['distance_value'] = resp['distance_value']
+            # Ensure origin and destination have values
+            if not request.GET.get('locations') or not event.get('location'):
+                return
+            else:
+                resp = gmaps.get_distance(**api_params)
+                # If request is successful, assign the appropriate values in each event dict
+                if resp['Success'] == 'OK':
+                    event['distance_text'] = resp['distance_text']
+                    event['distance_value'] = resp['distance_value']
 
     # Perform the get request to google api for the appropriate service and location
     now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
@@ -82,11 +86,11 @@ def search(request):
         events_today = list(var_map[services].get_events(**api_params))
         add_distance(events_today)
         sort_events(events_today)
-        
+
     return render(
         request,
         'search.html',
-        context={'events': events_today, 'service': request.GET.get('services')}
+        context={'events': events_today, 'origin': request.GET.get('locations'), 'service': request.GET.get('services')}
     )
 
 
@@ -94,6 +98,8 @@ def details(request, service=None, event_id=None):
     """
     Renders the detail page for a given event id
     """
+
+    origin = request.GET.get('locations')
 
     if service in var_map:
         google_event_params = {
@@ -111,5 +117,6 @@ def details(request, service=None, event_id=None):
                                                     'description': event.description,
                                                     'date': event.start_datetime.date,
                                                     'time': event.start_datetime.time,
-                                                    'recurrence': event.reccurence
+                                                    'recurrence': event.reccurence,
+                                                    'origin': origin
                                                     })
