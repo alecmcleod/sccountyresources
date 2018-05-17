@@ -6,6 +6,7 @@
     Jinja that extends this class from the base_generic HTML file
 -->
 {% extends "base_generic.html" %} {% block content %}
+
 <!--
     Header welcoming the client/user to the website
 -->
@@ -41,4 +42,26 @@
 </div>
 <iframe src="https://calendar.google.com/calendar/embed?mode=WEEK&amp;height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=hv4cl31tra0t7l0ggbfrev6tes%40group.calendar.google.com&amp;color=%230F4B38&amp;ctz=America%2FLos_Angeles" style="border-width:0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
 </div>
+<script>
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(getPosition);
+} else {
+}
+
+function getPosition(position) {
+    var post_data = {
+      'csrfmiddlewaretoken': "{{csrf_token}}",
+      'lat': position.coords.latitude,
+      'long': position.coords.longitude
+    }
+    $.ajax({
+        url: "",
+        type: "POST",
+        data: post_data,
+        dataType: "json"
+        });
+}</script>
+<!--{% load static %}
+  <script src="{% static 'js/geolocation.js' %}"></script>-->
+
 {% endblock %}
