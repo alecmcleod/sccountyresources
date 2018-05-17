@@ -37,10 +37,21 @@ def index(request):
 
 def search(request):
 
+    def sort_events(events):
+        """
+        Sorts events in the event list by distance
+        :param events: list to be sorted
+        """
+        # the key defines what value is used to sort by in the event dictionaries. If it is missing it will return none
+        def event_key(event):
+            missing_distance = (event.get('distance_value') is None)
+            return (missing_distance, event.get('distance_value') if not missing_distance else None)
+        list.sort(events, key=event_key)
+
     def add_distance(events):
         """
         Adds distance_value (int) and distance_text (string) to all events in an event list. Modifies list in place and
-        has no return value
+        has no return value. Also sorts list by distance
         :param events: list of event objects to be modified
         """
         for event in events:
@@ -69,6 +80,7 @@ def search(request):
     else:
         events_today = list(var_map[services].get_events(**api_params))
         add_distance(events_today)
+        sort_events(events_today)
         
     return render(
         request,
