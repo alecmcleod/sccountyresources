@@ -26,13 +26,15 @@ class GoogleEvent():
                         default_summary = None, 
                         default_location = None, 
                         default_description = None,
-                        default_start_datetime = datetime.now(),
-                        default_end_datetime = datetime.now(),
+                        default_start_datetime = datetime.utcnow().isoformat() +"Z",
+                        default_end_datetime = datetime.utcnow().isoformat() +"Z",
                         default_reccurence = None):
         self.id = event.get("id")
         self.summary = event.get("summary", default_summary)
         self.location = event.get("location", default_location)
         self.description = event.get("description", default_description)
+
+
         self.start_datetime = parse(event["start"].get("dateTime", default_start_datetime))
         self.end_datetime = parse(event["end"].get("dateTime", default_end_datetime))
 
@@ -40,6 +42,9 @@ class GoogleEvent():
             self.reccurence = parse_recurrence(event["reccurence"])
         except KeyError:
             self.reccurence = default_reccurence
+    
+    def __repr__(self):
+        return f"GoogleEvent(id: {self.id} summary:{self.summary} location:{self.location} description:{self.description} start_datetime:{self.start_datetime} end_datetime:{self.end_datetime} reccurence:{self.reccurence})"
 
 class GoogleCalendar:
     """
