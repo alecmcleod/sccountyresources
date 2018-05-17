@@ -66,44 +66,20 @@ def details(request, service=None, event_id=None):
     '''         pretaining to an event with id 'event_id' '''
 
     if service in var_map:
-        event = var_map[service].get_event(event_id)
+        google_event_params = {
+            'default_summary': '',
+            'default_reccurence': '',
+            'default_location': '1515 Ocean St, Santa Cruz, CA 95060',
+            'default_description': ''
+        }
+        event = var_map[service].get_event(event_id, dict(), **google_event_params)
     else:
         return render(request, '404.html')
 
-    if not event:
-        return render(request, '404.html')
-
-    title = event.get('summary', '')
-    try:
-        recurrence = parse_recurrence(event['recurrence'])
-    except KeyError:
-        recurrence = ''
-
-    location = event.get('location', '1515 Ocean St, Santa Cruz, CA 95060')
-    text = event.get('description', '')
-    event_date = event['start'].get('dateTime', '')
-    event_time = event['start'].get('date', '')
-
-    if '-' in event_time:
-        ed_list = event_time.split('-')
-        ed_list[2] = ed_list[2].split('T')[0] 
-        event_time = calendar.month_name[int(ed_list[1])] + ' , ' + ed_list[2] + ' , ' + ed_list[0]
-    elif ':' in event_time:
-        event_time = to_standard(event_time) 
-
-    # ^ ^ this requires explanation. some people think its fun to enter
-    #the time as the date or the date as the time. this is to fix monkey
-    #problems.
-
-    if event_date is not '':
-        ed_list = event_date.split('-')
-        ed_list[2] = ed_list[2].split('T')[0] 
-        event_date = calendar.month_name[int(ed_list[1])] + ' , ' + ed_list[2] + ' , ' + ed_list[0]
-
-    return render(request, 'details.html', context={'title': title,
-                                                    'location': location,
-                                                    'description': text,
-                                                    'date': event_date,
-                                                    'time': event_time,
-                                                    'recurrence':recurrence
+    return render(request, 'details.html', context={'title': event.summary,
+                                                    'location': event.location,
+                                                    'description': event.description,
+                                                    'date': event.start_datetime.date,
+                                                    'time': event.start_datetime.time,
+                                                    'recurrence': event.reccurence
                                                     })
