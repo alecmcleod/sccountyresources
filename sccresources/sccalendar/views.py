@@ -34,6 +34,12 @@ def index(request):
         context={'form': form},
     )
 
+def calendars(request):
+    return render(
+        request,
+        'calendars.html'
+    )
+
 
 def search(request):
 
@@ -69,7 +75,7 @@ def search(request):
     else:
         events_today = list(var_map[services].get_events(**api_params))
         add_distance(events_today)
-        
+
     return render(
         request,
         'search.html',
