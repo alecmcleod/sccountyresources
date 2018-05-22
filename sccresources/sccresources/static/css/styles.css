@@ -1,0 +1,48 @@
+/* Author: Zhanhua Hu
+ * Created for SCCR, 2018
+ */
+
+/* Importing miscellaneous fonts to be used
+ */
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+@import url('https://fonts.googleapis.com/css?family=Arvo');
+
+.modal
+{
+    overflow-y: scroll;
+}
+
+/* Customizing the "brand" header in the navbar
+ */
+.navbar-brand
+{
+    font-family:'Arvo', serif;
+}
+
+/* Font styling for all other items on the navbar
+ */
+.navbar-collapse
+{
+    font-family:'Arvo', serif;
+}
+
+/* General header styling
+ */
+#header
+{
+    font-family: 'Arvo', serif;
+    font-size: 30px;
+}
+
+#tag
+{
+	background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+}
