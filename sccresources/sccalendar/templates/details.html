@@ -14,45 +14,45 @@
 
             <div class=row style =  'margin: auto;width: 80%; padding: 10px;'>
 
-          	<div class=col-sm-6 >
-         	 <div>
-         	 	 <h2>{{date}} {{time}}</h2>
-         	 	 <h3> {{location}}</h3>
-         	 </div>
+            <div class=col-sm-6 >
+           <div>
+             <h2>{{date}} {{time}}</h2>
+             <h3> {{location}}</h3>
+           </div>
            <div>
 
            </div>
-         	 <br>
-         	 <p>{{description}}</p>
+           <br>
+           <p>{{description}}</p>
 
-      		</div>
+          </div>
           <!-- google map -->
-      		<div class=col-sm-6>
-				{% if origin %}
-					<iframe
-					width="300"
-					height="300"
-					frameborder="0" style="border:0"
-					src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g
-						  &origin={{origin}}
-						  &destination={{location}}"
-					allowfullscreen>
-					</iframe>
-				{% else %}
-					<iframe
-					width="300"
-					height="300"
-					frameborder="0" style="border:0"
-					src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g
-					&q={{location}}" allowfullscreen>
-					</iframe>
-				{% endif %}
-      			<br>
-      			<br>
+          <div class=col-sm-6>
+        {% if origin %}
+          <iframe
+          width="300"
+          height="300"
+          frameborder="0" style="border:0"
+          src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g
+              &origin={{origin}}
+              &destination={{location}}"
+          allowfullscreen>
+          </iframe>
+        {% else %}
+          <iframe
+          width="300"
+          height="300"
+          frameborder="0" style="border:0"
+          src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g
+          &q={{location}}" allowfullscreen>
+          </iframe>
+        {% endif %}
+            <br>
+            <br>
             <!-- export buttons -->
-      			<button type="button" class="btn btn-primary">export to ical</button>
-      			<button type="button" class="btn btn-primary">export to google calendars</button>
-      		</div>
+            <button type="button" class="btn btn-primary">export to ical</button>
+            <button type="button" class="btn btn-primary">export to google calendars</button>
+          </div>
       </div>
 
 
