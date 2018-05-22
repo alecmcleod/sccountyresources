@@ -6,6 +6,7 @@
     Jinja that extends this class from the base_generic HTML file
 -->
 {% extends "base_generic.html" %} {% block content %}
+
 <!--
     Header welcoming the client/user to the website
 -->
@@ -47,5 +48,27 @@
     </div>
   </div>
 </div>
+
+<script>
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(getPosition);
+} else {
+}
+
+function getPosition(position) {
+    var post_data = {
+      'csrfmiddlewaretoken': "{{csrf_token}}",
+      'lat': position.coords.latitude,
+      'long': position.coords.longitude
+    }
+    $.ajax({
+        url: "",
+        type: "POST",
+        data: post_data,
+        dataType: "json"
+        });
+}</script>
+<!--{% load static %}
+  <script src="{% static 'js/geolocation.js' %}"></script>-->
 
 {% endblock %}

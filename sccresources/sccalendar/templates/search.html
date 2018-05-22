@@ -3,7 +3,7 @@
 <h1>Events Happening Today</h1>
 <div class="list-group">
     {% for event in events %}
-    <a href="/calendar/details/{{service}}/{{event.id}}" class="list-group-item">
+    <a href="/calendar/details/{{service}}/{{event.id}}?locations={{origin}}" class="list-group-item">
         <h4 class="list-group-item-heading">{{event.summary}}</h4>
         <p class="list-group-item-text">{{event.description}}</p>
         <p class="list-group-item-text">{{event.distance_text}}</p>

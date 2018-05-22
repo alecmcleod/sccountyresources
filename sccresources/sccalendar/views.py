@@ -22,6 +22,7 @@ var_map = {"DRUGS": DRUG_CAL, "FOOD": FOOD_CAL, "HEALTH": HEALTH_CAL, "SHOWER": 
 # Google maps variable
 gmaps = GoogleMaps('AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
 
+
 # Create your views here.
 def index(request):
 
@@ -43,10 +44,21 @@ def calendars(request):
 
 def search(request):
 
+    def sort_events(events):
+        """
+        Sorts events in the event list by distance
+        :param events: list to be sorted
+        """
+        # the key defines what value is used to sort by in the event dictionaries. If it is missing it will return none
+        def event_key(event):
+            missing_distance = (event.get('distance_value') is None)
+            return missing_distance, event.get('distance_value') if not missing_distance else None
+        list.sort(events, key=event_key)
+
     def add_distance(events):
         """
         Adds distance_value (int) and distance_text (string) to all events in an event list. Modifies list in place and
-        has no return value
+        has no return value. Also sorts list by distance
         :param events: list of event objects to be modified
         """
         for event in events:
@@ -54,11 +66,15 @@ def search(request):
             api_params = {'origins': [request.GET.get('locations')],
                           'destinations': [event.get('location')],
                           'units': 'imperial'}
-            resp = gmaps.get_distance(**api_params)
-            # If request is successful, assign the appropriate values in each event dict
-            if resp['Success'] == 'OK':
-                event['distance_text'] = resp['distance_text']
-                event['distance_value'] = resp['distance_value']
+            # Ensure origin and destination have values
+            if not request.GET.get('locations') or not event.get('location'):
+                return
+            else:
+                resp = gmaps.get_distance(**api_params)
+                # If request is successful, assign the appropriate values in each event dict
+                if resp['Success'] == 'OK':
+                    event['distance_text'] = resp['distance_text']
+                    event['distance_value'] = resp['distance_value']
 
     # Perform the get request to google api for the appropriate service and location
     now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
@@ -75,16 +91,21 @@ def search(request):
     else:
         events_today = list(var_map[services].get_events(**api_params))
         add_distance(events_today)
+        sort_events(events_today)
 
     return render(
         request,
         'search.html',
-        context={'events': events_today, 'service': request.GET.get('services')}
+        context={'events': events_today, 'origin': request.GET.get('locations'), 'service': request.GET.get('services')}
     )
 
+
 def details(request, service=None, event_id=None):
-    '''Details: returns a response with all event info'''
-    '''         pretaining to an event with id 'event_id' '''
+    """
+    Renders the detail page for a given event id
+    """
+
+    origin = request.GET.get('locations')
 
     if service in var_map:
         google_event_params = {
@@ -102,5 +123,6 @@ def details(request, service=None, event_id=None):
                                                     'description': event.description,
                                                     'date': event.start_datetime.date,
                                                     'time': event.start_datetime.time,
-                                                    'recurrence': event.reccurence
+                                                    'recurrence': event.reccurence,
+                                                    'origin': origin
                                                     })

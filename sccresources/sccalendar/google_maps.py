@@ -24,7 +24,6 @@ class GoogleMaps:
         :param api_params: a list of parameters to be passed to the gmaps API
         :return {'distance_value': int, 'distance_text': string, 'Success': string}
         """
-        print(api_params)
         # Make the request with the given parameters and convert it to JSON
         resp = json.loads(json.dumps(self.service.distance_matrix(**api_params)))
         # Ensure that the distance request was successful
@@ -34,4 +33,5 @@ class GoogleMaps:
             return {'distance_value': distance_value, 'distance_text': distance_text, 'Success': 'OK'}
         else:
             return {'distance_value': None, 'distance_text': None, 'Success': None}
+
 
