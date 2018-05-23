@@ -112,7 +112,7 @@ def details(request, service=None, event_id=None):
             'default_location': '1515 Ocean St, Santa Cruz, CA 95060',
             'default_description': ''
         }
-        event = var_map[service].get_event(event_id, dict(), **google_event_params)
+        event = var_map[service].get_event(event_id, dict(), google_event_params)
     else:
         return render(request, '404.html')
 
