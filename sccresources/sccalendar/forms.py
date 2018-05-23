@@ -11,3 +11,7 @@ class SearchForm(forms.Form):
 
     services = forms.ChoiceField(label='I need', widget=forms.Select, choices=SERVICES_CHOICES, required=False, label_suffix="")
     locations = forms.ChoiceField(label='near', widget=forms.Select, choices=LOCATION_CHOICES, required=False, label_suffix="")
+
+class SubscribeForm(forms.Form):
+
+	phone_number = '+1' + str(forms.CharField(required=True,max_length=10,min_length=10))

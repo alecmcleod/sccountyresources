@@ -4,7 +4,7 @@ from . import google_auth
 from datetime import datetime, time, timedelta
 from .google_calendar import GoogleCalendar
 from .google_maps import GoogleMaps
-from .forms import SearchForm
+from .forms import SearchForm, SubscribeForm
 from .modules import sms
 from .utils import to_sent, parse_recurrence, to_standard
 
@@ -108,6 +108,8 @@ def details(request, service=None, event_id=None):
 
     origin = request.GET.get('locations')
 
+    form = SubscribeForm(request.POST)
+
     if service in var_map:
         google_event_params = {
             'default_summary': '',
@@ -118,12 +120,6 @@ def details(request, service=None, event_id=None):
         event = var_map[service].get_event(event_id, dict(), **google_event_params)
     else:
         return render(request, '404.html')
-
-    if event.reccurence:
-        print(event.reccurence)
-
-    sms.add_reminder(event_id, service , event.start_datetime.date() \
-                    ,event.start_datetime.time(), event.reccurence, '+15104576818')
 
     return render(request, 'details.html', context={'title': event.summary,
                                                     'location': event.location,
