@@ -22,7 +22,7 @@ class GoogleEvent():
     end_datetime - A datetime object containing the end date and time of the event
     reccurence - A textual representation of the days the event reccurers on.
     """
-    def __init__(self, event, 
+    def __init__(self,  event, 
                         default_summary = None, 
                         default_location = None, 
                         default_description = None,
@@ -78,7 +78,7 @@ class GoogleCalendar:
     def __repr__(self):
         return "GoogleCalendar(" + self.service + ", " + self.calendar_id + ")"
     
-    def get_event(self, event_id, api_params=dict(), **google_event_params) -> GoogleEvent:
+    def get_event(self, event_id, api_params=dict(), google_event_params=dict()) -> GoogleEvent:
         """
         Returns an event by it's id.
 
@@ -90,9 +90,10 @@ class GoogleCalendar:
         event = self.service.events().get(calendarId=self.calendar_id, eventId=event_id, **api_params).execute()
         return GoogleEvent(event, **google_event_params)
 
-    def get_events(self, **api_params) -> Generator[dict, None, None]:
+    def get_raw_events(self, api_params=dict()) -> Generator[dict, None, None]:
         """
         Returns a generator that can be used to iterate over all the events in the calendar.
+        Events are returned as-is from the API.
         """
         resp = self.service.events().list(calendarId=self.calendar_id, **api_params).execute()
         while True:
@@ -113,7 +114,7 @@ class GoogleCalendar:
         cal["summary"] = self.summary
         cal["description"] = self.description
 
-        for event in self.get_events(**api_params):
+        for event in self.get_raw_events(**api_params):
             i_event = Event()
             i_event.add("summary",      event["summary"])
             i_event.add("description",  event.get("description"))

@@ -1,15 +1,15 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
-from . import google_auth
+import calendar
 from datetime import datetime, time, timedelta
+from typing import Dict
+import googlemaps
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+
+from . import google_auth
+from .forms import SearchForm
 from .google_calendar import GoogleCalendar
 from .google_maps import GoogleMaps
-from .forms import SearchForm
-from .utils import to_sent, parse_recurrence, to_standard
-
-import calendar
-import googlemaps
-
+from .utils import parse_recurrence, to_sent, to_standard
 
 # Calendar ID variables
 FOOD_CAL    = GoogleCalendar(google_auth.get_service(), 'hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com')
@@ -17,15 +17,13 @@ DRUG_CAL    = GoogleCalendar(google_auth.get_service(), 'nu02uodssn6j0ij4o3l4rqv
 HEALTH_CAL  = GoogleCalendar(google_auth.get_service(), 'vlqtpo7ig0mbvpmk91j8r736kk@group.calendar.google.com')
 SHOWER_CAL  = GoogleCalendar(google_auth.get_service(), 'uk8elskt37v991sbe3k7qasu1k@group.calendar.google.com')
 # Maps keywords to Calendar variables
-var_map = {"DRUGS": DRUG_CAL, "FOOD": FOOD_CAL, "HEALTH": HEALTH_CAL, "SHOWER": SHOWER_CAL}
+var_map: Dict[str, GoogleCalendar] = {"DRUGS": DRUG_CAL, "FOOD": FOOD_CAL, "HEALTH": HEALTH_CAL, "SHOWER": SHOWER_CAL}
 
 # Google maps variable
 gmaps = GoogleMaps('AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
 
-
 # Create your views here.
 def index(request):
-
     form = SearchForm(request.GET)
 
     return render(
@@ -89,7 +87,7 @@ def search(request):
         # Requested service doesn't exist
         return render(request, '404.html')
     else:
-        events_today = list(var_map[services].get_events(**api_params))
+        events_today = list(var_map[services].get_raw_events(api_params))
         add_distance(events_today)
         sort_events(events_today)
 
