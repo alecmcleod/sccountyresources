@@ -36,6 +36,12 @@ def index(request):
         context={'form': form},
     )
 
+def calendars(request):
+    return render(
+        request,
+        'calendars.html'
+    )
+
 
 def search(request):
 
