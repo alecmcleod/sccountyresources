@@ -9,5 +9,9 @@ class SearchForm(forms.Form):
     LOCATION_CHOICES = (('', ''), ('Santa Cruz, CA', 'Santa Cruz'), ('Watsonville, CA', 'Watsonville'), ('Scotts Valley, CA', 'Scotts Valley'),
                         ('Felton, CA', 'Felton'), ('Boulder Creek, CA', 'Boulder Creek'), ('Davenport, CA', 'Davenport'))
 
-    services = forms.ChoiceField(label='I need ', widget=forms.Select, choices=SERVICES_CHOICES, required=False)
-    locations = forms.ChoiceField(label=' near ', widget=forms.Select, choices=LOCATION_CHOICES, required=False)
+    services = forms.ChoiceField(label='I need', widget=forms.Select, choices=SERVICES_CHOICES, required=False, label_suffix="")
+    locations = forms.ChoiceField(label='near', widget=forms.Select, choices=LOCATION_CHOICES, required=False, label_suffix="")
+
+class SubscribeForm(forms.Form):
+
+	phone_number = '+1' + str(forms.CharField(required=True,max_length=10,min_length=10))

@@ -4,7 +4,8 @@ from . import google_auth
 from datetime import datetime, time, timedelta
 from .google_calendar import GoogleCalendar
 from .google_maps import GoogleMaps
-from .forms import SearchForm
+from .forms import SearchForm, SubscribeForm
+from .modules import sms
 from .utils import to_sent, parse_recurrence, to_standard
 
 import calendar
@@ -33,6 +34,12 @@ def index(request):
         'index.html',
         # Passes the contents of the brackets to the template
         context={'form': form},
+    )
+
+def calendars(request):
+    return render(
+        request,
+        'calendars.html'
     )
 
 
@@ -100,6 +107,8 @@ def details(request, service=None, event_id=None):
     """
 
     origin = request.GET.get('locations')
+
+    form = SubscribeForm(request.POST)
 
     if service in var_map:
         google_event_params = {

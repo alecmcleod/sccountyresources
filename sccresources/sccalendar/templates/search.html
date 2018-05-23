@@ -1,6 +1,6 @@
 {% extends "base_generic.html" %} {% block content %}
 
-<h2>Today:</h2>
+<h1>Events Happening Today</h1>
 <div class="list-group">
     {% for event in events %}
     <a href="/calendar/details/{{service}}/{{event.id}}?locations={{origin}}" class="list-group-item">
@@ -11,6 +11,4 @@
     <p></p>
     {% endfor %}
 </div>
-
-
 {% endblock %}
