@@ -29,6 +29,8 @@ class GoogleEvent():
                         default_start_datetime = datetime.utcnow().isoformat() +"Z",
                         default_end_datetime = datetime.utcnow().isoformat() +"Z",
                         default_reccurence = None):
+        self._event = event
+
         self.id = event.get("id")
         self.summary = event.get("summary", default_summary)
         self.location = event.get("location", default_location)
@@ -45,6 +47,27 @@ class GoogleEvent():
     
     def __repr__(self):
         return f"GoogleEvent(id: {self.id} summary:{self.summary} location:{self.location} description:{self.description} start_datetime:{self.start_datetime} end_datetime:{self.end_datetime} reccurence:{self.reccurence})"
+
+    def to_ical_event(self) -> Event:
+        """
+        Returns this event as an iCalendar Event object
+        """
+        event = Event()
+        event.add("uid",            self._event["iCalUID"])
+        event.add("summary",        self.summary)
+        event.add("location",       self.location)
+        event.add("description",    self.description)
+        event.add("dtstart",        self.start_datetime)
+        event.add("dtend",          self.end_datetime)
+        return event
+
+    def to_ical(self) -> Calendar:
+        """
+        Returns this event as an iCalendar Calendar object
+        """
+        cal = Calendar()
+        cal.add_component(self.to_ical_event())
+        return cal
 
 class GoogleCalendar:
     """
