@@ -2,11 +2,49 @@
 Package for working with Google Calendar and iCal
 """
 from . import google_auth
+from .utils import parse_recurrence
 from datetime import datetime
 from typing import Generator
 from icalendar import Calendar, Event
 from googleapiclient.discovery import Resource
 from pyrfc3339 import parse
+
+class GoogleEvent():
+    """
+    Represents an event on a google calendar
+
+    Properties:
+    id - String representing the event id
+    summary - String containting the summary of the event (title)
+    location - A string containing the location of the event
+    description - A string containing the description of the event
+    start_datetime - A datetime object containing the start date and time of the event
+    end_datetime - A datetime object containing the end date and time of the event
+    reccurence - A textual representation of the days the event reccurers on.
+    """
+    def __init__(self, event, 
+                        default_summary = None, 
+                        default_location = None, 
+                        default_description = None,
+                        default_start_datetime = datetime.utcnow().isoformat() +"Z",
+                        default_end_datetime = datetime.utcnow().isoformat() +"Z",
+                        default_reccurence = None):
+        self.id = event.get("id")
+        self.summary = event.get("summary", default_summary)
+        self.location = event.get("location", default_location)
+        self.description = event.get("description", default_description)
+
+
+        self.start_datetime = parse(event["start"].get("dateTime", default_start_datetime))
+        self.end_datetime = parse(event["end"].get("dateTime", default_end_datetime))
+
+        try:
+            self.reccurence = parse_recurrence(event["reccurence"])
+        except KeyError:
+            self.reccurence = default_reccurence
+    
+    def __repr__(self):
+        return f"GoogleEvent(id: {self.id} summary:{self.summary} location:{self.location} description:{self.description} start_datetime:{self.start_datetime} end_datetime:{self.end_datetime} reccurence:{self.reccurence})"
 
 class GoogleCalendar:
     """
@@ -40,6 +78,18 @@ class GoogleCalendar:
     def __repr__(self):
         return "GoogleCalendar(" + self.service + ", " + self.calendar_id + ")"
     
+    def get_event(self, event_id, api_params=dict(), **google_event_params) -> GoogleEvent:
+        """
+        Returns an event by it's id.
+
+        Params:
+        event_id - A string containing the id of the event
+        api_params - A dict containing paramters to pass to the Google Calendar API
+        google_event_params - Optional paramters to pass to the GoogleEvent object
+        """
+        event = self.service.events().get(calendarId=self.calendar_id, eventId=event_id, **api_params).execute()
+        return GoogleEvent(event, **google_event_params)
+
     def get_events(self, **api_params) -> Generator[dict, None, None]:
         """
         Returns a generator that can be used to iterate over all the events in the calendar.

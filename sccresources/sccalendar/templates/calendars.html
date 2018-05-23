@@ -1,0 +1,38 @@
+<!--
+    Author: Zhanhua Hu
+    Created for SCCR, 2018
+-->
+<!--
+    Jinja that extends this class from the base_generic HTML file
+-->
+{% extends "base_generic.html" %} {% block content %}
+
+<!--
+    The contact form, with multiple rows indicating the Name, Phone number, Email address, Subject, and Message
+-->
+<div id="calendar" class="container">
+	<p class="text-center mt-5" id="header">Calendars</p>
+</div>
+
+<!--
+	The dropdown menu, which the user may choose which between the "food", "clothing", and "drugs" calendars
+-->
+<div class="dropdown">
+	<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	- Choose a calendar -
+	</button>
+	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" onclick="whichCalendar('food');">Food calendar</a>
+		<a class="dropdown-item" onclick="whichCalendar('drugs');">Drugs calendar</a>
+		<a class="dropdown-item" onclick="whichCalendar('health');">Health calendar</a>
+		<a class="dropdown-item" onclick="whichCalendar('shower');">Shower
+      calendar</a>
+	</div>
+</div>
+
+<!--
+	JQuery in the index.js file dynamically inserts HTML into this div based on which calendar
+	the user chooses
+-->
+<div id="google-cal"></div>
+{% endblock %}

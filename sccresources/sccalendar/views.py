@@ -2,25 +2,26 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from . import google_auth
 from datetime import datetime, time, timedelta
+from .google_calendar import GoogleCalendar
+from .google_maps import GoogleMaps
 from .forms import SearchForm
+from .utils import to_sent, parse_recurrence, to_standard
+
 import calendar
 import googlemaps
 
 
 # Calendar ID variables
-FOOD_CAL = 'hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com'
-DRUG_CAL = 'nu02uodssn6j0ij4o3l4rqv9dk@group.calendar.google.com'
-HEALTH_CAL = 'vlqtpo7ig0mbvpmk91j8r736kk@group.calendar.google.com'
-SHOWER_CAL = 'uk8elskt37v991sbe3k7qasu1k@group.calendar.google.com'
+FOOD_CAL    = GoogleCalendar(google_auth.get_service(), 'hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com')
+DRUG_CAL    = GoogleCalendar(google_auth.get_service(), 'nu02uodssn6j0ij4o3l4rqv9dk@group.calendar.google.com')
+HEALTH_CAL  = GoogleCalendar(google_auth.get_service(), 'vlqtpo7ig0mbvpmk91j8r736kk@group.calendar.google.com')
+SHOWER_CAL  = GoogleCalendar(google_auth.get_service(), 'uk8elskt37v991sbe3k7qasu1k@group.calendar.google.com')
+# Maps keywords to Calendar variables
+var_map = {"DRUGS": DRUG_CAL, "FOOD": FOOD_CAL, "HEALTH": HEALTH_CAL, "SHOWER": SHOWER_CAL}
 
 # Google maps variable
-gmaps = googlemaps.Client(key='AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
+gmaps = GoogleMaps('AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
 
-origins = ['603 Laguna St Santa Cruz']
-destinations = ['UCSC']
-print(gmaps.distance_matrix(origins, destinations))
-
-print('test')
 
 # Create your views here.
 def index(request):
@@ -34,184 +35,94 @@ def index(request):
         context={'form': form},
     )
 
+def calendars(request):
+    return render(
+        request,
+        'calendars.html'
+    )
+
 
 def search(request):
 
+    def sort_events(events):
+        """
+        Sorts events in the event list by distance
+        :param events: list to be sorted
+        """
+        # the key defines what value is used to sort by in the event dictionaries. If it is missing it will return none
+        def event_key(event):
+            missing_distance = (event.get('distance_value') is None)
+            return missing_distance, event.get('distance_value') if not missing_distance else None
+        list.sort(events, key=event_key)
+
+    def add_distance(events):
+        """
+        Adds distance_value (int) and distance_text (string) to all events in an event list. Modifies list in place and
+        has no return value. Also sorts list by distance
+        :param events: list of event objects to be modified
+        """
+        for event in events:
+            # Brackets are necessary around origins and destinations because the google API expects a list
+            api_params = {'origins': [request.GET.get('locations')],
+                          'destinations': [event.get('location')],
+                          'units': 'imperial'}
+            # Ensure origin and destination have values
+            if not request.GET.get('locations') or not event.get('location'):
+                return
+            else:
+                resp = gmaps.get_distance(**api_params)
+                # If request is successful, assign the appropriate values in each event dict
+                if resp['Success'] == 'OK':
+                    event['distance_text'] = resp['distance_text']
+                    event['distance_value'] = resp['distance_value']
+
     # Perform the get request to google api for the appropriate service and location
-    def get_results():
-        now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
-        tomorrow = (datetime.combine(datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
-        if request.GET.get('services') == 'DRUGS':
-            events_today = google_auth.get_service().events().list(
-                calendarId=DRUG_CAL,
-                timeMin=now,
-                timeMax=tomorrow,
-                singleEvents=True,
-                orderBy='startTime').execute()
-        elif request.GET.get('services') == 'FOOD':
-            events_today = google_auth.get_service().events().list(
-                calendarId=FOOD_CAL,
-                timeMin=now,
-                timeMax=tomorrow,
-                singleEvents=True,
-                orderBy='startTime').execute()
-        elif request.GET.get('services') == 'HEALTH':
-            events_today = google_auth.get_service().events().list(
-                calendarId=HEALTH_CAL,
-                timeMin=now,
-                timeMax=tomorrow,
-                singleEvents=True,
-                orderBy='startTime').execute()
-        elif request.GET.get('services') == 'SHOWER':
-            events_today = google_auth.get_service().events().list(
-                calendarId=SHOWER_CAL,
-                timeMin=now,
-                timeMax=tomorrow,
-                singleEvents=True,
-                orderBy='startTime').execute()
-        else:
-            return render(request, '404.html')
-        return events_today
+    now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
+    tomorrow = (datetime.combine(datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
+    api_params = {'timeMin': now, 'timeMax': tomorrow, 'singleEvents': True, 'orderBy': "startTime"}
 
-    # If there are no search parameters, redirect to home page
-    if not request.GET.get('services'):
+    services = request.GET.get('services')
+    if services is None:
+        # If there are no search parameters, redirect to home page
         return HttpResponseRedirect('/')
+    elif services not in var_map:
+        # Requested service doesn't exist
+        return render(request, '404.html')
     else:
-        events = get_results().get('items', [])
-        return render(
-            request,
-            'search.html',
-            context={'events': events, 'service': request.GET.get('services')}
-        )
+        events_today = list(var_map[services].get_events(**api_params))
+        add_distance(events_today)
+        sort_events(events_today)
 
+    return render(
+        request,
+        'search.html',
+        context={'events': events_today, 'origin': request.GET.get('locations'), 'service': request.GET.get('services')}
+    )
 
 
 def details(request, service=None, event_id=None):
-    '''Details: returns a response with all event info'''
-    '''         pretaining to an event with id 'event_id' '''
+    """
+    Renders the detail page for a given event id
+    """
 
-    def parse_recurrance(rec_list):
-        '''arguments: standard google calendars list of recurrance strings'''
-        '''output : an english string describing when an event recurrs'''
-        keys = ['FREQ','COUNT','INTERVAL','BYDAY','UNTIL']
-        parse = ''
-        out_string = ''
-        for rule in rec_list:
-            for key in keys:
-                if key in rule:
-                    parse = rule.split('=')
-                    if parse[0] is 'FREQ':
-                        parse = parse[1].lower() + ', '
-                    elif parse[0]  is 'COUNT':
-                        parse = ''
-                    elif parse[0]  is 'INTERVAL':
-                        parse = ''
-                    elif parse[0]  is 'BYDAY':
-                        parse = 'on' + to_sent(parse[1])
-                    elif parse[0]  is 'UNTIL':
-                        parse = 'until' + calendar.month_name(int(parse[1][5:6])) + ',' + parse[1][7:]
-                    else:
-                        break
-            out_string += ("this event occurs " + parse)
-        return out_string
+    origin = request.GET.get('locations')
 
-    def to_sent(abbrv_string):
-        '''to_sent: input: a comma seperate string of day abbreviations
-                    output: an english sentence enumerating those days'''
-        abbrv_dict = {'MO':'Monday','TU':'Tuesday','WE':'Wednesday'
-        ,'TH':'Thursday','FR':'Friday','SA':'Saturday','SU':'Sunday'}
-        
-        abbrv_list = abbrv_string.split(',')
-        
-        length = len(abbrv_list)-1
-        
-        sent = ' '
-
-        for i  in range(length):
-           sent += abbrv_dict[abbrv_list[i]]
-
-        sent += ("and " + abbrv_dict[length+1])
-
-        return sent
-
-
-    def to_standard(military_string):
-        '''to_standard: converts military time to standard and adds meridean'''
-
-        military_list = military_string.split(':')
-        if int(military_list[0]) > 12:
-            return str( int(military_list[0])-12 ) + ':' + military_list[1] + " P.M."
-        else:
-            return str( int(military_list[0]) ) + ':' + military_list[1] + " A.M."
-
-    if service == 'DRUGS':
-        event = google_auth.get_service().events().get(calendarId=DRUG_CAL, eventId=event_id).execute()
-    elif service == 'FOOD':
-        event = google_auth.get_service().events().get(calendarId=FOOD_CAL, eventId=event_id).execute()
-    elif service == 'HEALTH':
-        event = google_auth.get_service().events().get(calendarId=HEALTH_CAL, eventId=event_id).execute()
-    elif service == 'SHOWER':
-        event = google_auth.get_service().events().get(calendarId=DRUG_CAL, eventId=event_id).execute()
+    if service in var_map:
+        google_event_params = {
+            'default_summary': '',
+            'default_reccurence': '',
+            'default_location': '1515 Ocean St, Santa Cruz, CA 95060',
+            'default_description': ''
+        }
+        event = var_map[service].get_event(event_id, dict(), **google_event_params)
     else:
         return render(request, '404.html')
 
-    if not event:
-        return render(request, '404.html')
-
-    title = event.get('summary')
-    try:
-        recurrence = event[recurrence]
-        recurrence = parse_recurrance(recurrence)
-        print(recurrence)
-    except:
-        recurrence = None
-
-    location = event.get('location')
-    text = event.get('description')
-    event_date = event['start'].get('dateTime')
-    event_time = event['start'].get('date')
-
-    #if block which replaces the default values with empty strings
-
-    if text is None:
-        text = ''
-
-    if title is None:
-        title = ''
-
-    if location is None:
-        location = '1515 Ocean St, Santa Cruz, CA 95060'
-
-    if text is None:
-        text = ''
-
-    if recurrence is None:
-        recurrence = ''
-
-    if event_time is None:
-        event_time = ''
-    elif '-' in event_time:
-        ed_list = event_time.split('-')
-        ed_list[2] = ed_list[2].split('T')[0] 
-        event_time = calendar.month_name[int(ed_list[1])] + ' , ' + ed_list[2] + ' , ' + ed_list[0]
-    elif ':' in event_time:
-        event_time = to_standard(event_time) 
-
-    # ^ ^ this requires explanation. some people think its fun to enter
-    #the time as the date or the date as the time. this is to fix monkey
-    #problems.
-
-    if event_date is None:
-        event_date = ''
-    else:
-        ed_list = event_date.split('-')
-        ed_list[2] = ed_list[2].split('T')[0] 
-        event_date = calendar.month_name[int(ed_list[1])] + ' , ' + ed_list[2] + ' , ' + ed_list[0]
-
-    return render(request, 'details.html', context={'title': title,
-                                                    'location': location,
-                                                    'description': text,
-                                                    'date': event_date,
-                                                    'time': event_time,
-                                                    'recurrence':recurrence
+    return render(request, 'details.html', context={'title': event.summary,
+                                                    'location': event.location,
+                                                    'description': event.description,
+                                                    'date': event.start_datetime.date,
+                                                    'time': event.start_datetime.time,
+                                                    'recurrence': event.reccurence,
+                                                    'origin': origin
                                                     })

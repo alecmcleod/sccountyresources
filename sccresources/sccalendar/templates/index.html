@@ -6,6 +6,7 @@
     Jinja that extends this class from the base_generic HTML file
 -->
 {% extends "base_generic.html" %} {% block content %}
+
 <!--
     Header welcoming the client/user to the website
 -->
@@ -26,19 +27,48 @@
   <div class="card w-100">
     <div class="card-body">
       <h5 class="">About Santa Cruz County Resources</h5>
-      <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam quis erat at nulla sodales consectetur eu in arcu. Fusce congue sem eget turpis placerat euismod. Donec orci felis, pharetra non augue ac, condimentum gravida lectus. Ut auctor et ipsum
-        a faucibus. Integer malesuada iaculis mauris at ultrices. Aenean sit amet convallis eros, a vehicula diam. Etiam id massa nec mi vehicula consectetur et pulvinar odio. Mauris quis turpis vitae elit condimentum viverra in vitae orci. Morbi maximus
-        enim eget bibendum consequat. Vivamus erat dui, laoreet molestie elit ac, varius viverra orci. Nam malesuada massa a mi laoreet elementum. Suspendisse fermentum justo tortor. Donec varius ultricies ipsum.</p>
+      <p class="card-text">Our programs began on the corner of Coral and River Street in Santa Cruz in the
+          1980s as a loosely affiliated group of faith-based and secular organizations providing basic food
+          and shelter to people experiencing homelessness. They have evolved into four emergency and transitional
+          housing shelters for nearly 230 people, a medical clinic, and a 12-bed medical respite care facility.
+          <br /><br />
+          People experiencing homelessness are the most vulnerable members of our community.
+          They lack access to health care as well as housing, job opportunities, community connections,
+          and other advantages. They often have chronic illnesses made worse by their challenging living
+          conditions. Based on a study conducted in San Francisco, it can cost a community as much as
+          $61,000 for a chronically homeless person who lives on the streets for one year—for expenses
+          such as shelter stays, jail time, and emergency room visits.
+          <br /><br />
+          The County of Santa Cruz makes no representations or warrants as to the suitability of this
+          information for your particular purpose, and that to the extent you use or implement this
+          information in your own setting you do so at your own risk. The information provided herewith
+          is solely for your own use and cannot be sold. In no event will the County of Santa Cruz be liable
+          for any damages whatsoever, whether direct, consequential, incidental, special or on claim for attorney
+          fees arising out of the use of or inability to use the information provided herewith.</p>
     </div>
   </div>
 </div>
 
-<!--
-    The contact form, with multiple rows indicating the Name, Phone number, Email address, Subject, and Message
--->
-<div id="calendar" class="container">
-  <p class="text-center mt-5" id="header">Calendar</p>
-</div>
-<iframe src="https://calendar.google.com/calendar/embed?mode=WEEK&amp;height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=hv4cl31tra0t7l0ggbfrev6tes%40group.calendar.google.com&amp;color=%230F4B38&amp;ctz=America%2FLos_Angeles" style="border-width:0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
-</div>
+<script>
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(getPosition);
+} else {
+}
+
+function getPosition(position) {
+    var post_data = {
+      'csrfmiddlewaretoken': "{{csrf_token}}",
+      'lat': position.coords.latitude,
+      'long': position.coords.longitude
+    }
+    $.ajax({
+        url: "",
+        type: "POST",
+        data: post_data,
+        dataType: "json"
+        });
+}</script>
+<!--{% load static %}
+  <script src="{% static 'js/geolocation.js' %}"></script>-->
+
 {% endblock %}
