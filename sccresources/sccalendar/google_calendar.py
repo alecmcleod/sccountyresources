@@ -42,8 +42,13 @@ class GoogleEvent():
         except KeyError:
             # If a datetime doesn't exist, then it's likely an all-day event
             # According to the google api, date is in the format "yyyy-mm-dd"
-            self.start_datetime = datetime(*event["start"]["date"].split("-", 2), 0, 0, 0)
-            self.end_datetime = datetime(*event["end"]["date"].split("-", 2), 23, 59, 59)
+
+            # The mess that is the first paramter splits the string by "-"
+            # Then, it maps the array or strings to integers, after which it
+            # uses the splat operater to pass it to the first three paramters
+            # of datetime
+            self.start_datetime = datetime(*[int(x) for x in event["start"]["date"].split("-", 2)], 0, 0, 0)
+            self.end_datetime = datetime(*[int(x) for x in event["end"]["date"].split("-", 2)], 23, 59, 59)
             self._allday = True
             
         try:
