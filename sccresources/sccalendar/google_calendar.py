@@ -22,13 +22,12 @@ class GoogleEvent():
     end_datetime - A datetime object containing the end date and time of the event
     reccurence - A textual representation of the days the event reccurers on.
     """
-    def __init__(self,  event, 
-                        default_summary = None, 
-                        default_location = None, 
-                        default_description = None,
-                        default_start_datetime = datetime.utcnow().isoformat() +"Z",
-                        default_end_datetime = datetime.utcnow().isoformat() +"Z",
-                        default_reccurence = None):
+    def __init__(self, 
+                event,
+                default_summary = None, 
+                default_location = None, 
+                default_description = None,
+                default_reccurence = None):
         self._event = event
 
         self.id = event.get("id")
@@ -36,10 +35,17 @@ class GoogleEvent():
         self.location = event.get("location", default_location)
         self.description = event.get("description", default_description)
 
-
-        self.start_datetime = parse(event["start"].get("dateTime", default_start_datetime))
-        self.end_datetime = parse(event["end"].get("dateTime", default_end_datetime))
-
+        try:
+            # Try to parse the datetime like a normal event
+            self.start_datetime = parse(event["start"]["dateTime"])
+            self.end_datetime = parse(event["end"]["dateTime"])
+        except KeyError:
+            # If a datetime doesn't exist, then it's likely an all-day event
+            # According to the google api, date is in the format "yyyy-mm-dd"
+            self.start_datetime = datetime(*event["start"]["date"].split("-", 2), 0, 0, 0)
+            self.end_datetime = datetime(*event["end"]["date"].split("-", 2), 23, 59, 59)
+            self._allday = True
+            
         try:
             self.reccurence = parse_recurrence(event["reccurence"])
         except KeyError:
@@ -47,6 +53,13 @@ class GoogleEvent():
     
     def __repr__(self):
         return f"GoogleEvent(id: {self.id} summary:{self.summary} location:{self.location} description:{self.description} start_datetime:{self.start_datetime} end_datetime:{self.end_datetime} reccurence:{self.reccurence})"
+
+    @property
+    def is_allday(self) -> bool:
+        """
+        Returns true if the event is an all-day event
+        """
+        return self._allday
 
     def to_ical_event(self) -> Event:
         """
