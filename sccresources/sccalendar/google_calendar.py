@@ -22,22 +22,35 @@ class GoogleEvent():
     end_datetime - A datetime object containing the end date and time of the event
     reccurence - A textual representation of the days the event reccurers on.
     """
-    def __init__(self, event, 
-                        default_summary = None, 
-                        default_location = None, 
-                        default_description = None,
-                        default_start_datetime = datetime.utcnow().isoformat() +"Z",
-                        default_end_datetime = datetime.utcnow().isoformat() +"Z",
-                        default_reccurence = None):
+    def __init__(self, 
+                event,
+                default_summary = None, 
+                default_location = None, 
+                default_description = None,
+                default_reccurence = None):
+        self._event = event
+
         self.id = event.get("id")
         self.summary = event.get("summary", default_summary)
         self.location = event.get("location", default_location)
         self.description = event.get("description", default_description)
 
+        try:
+            # Try to parse the datetime like a normal event
+            self.start_datetime = parse(event["start"]["dateTime"])
+            self.end_datetime = parse(event["end"]["dateTime"])
+        except KeyError:
+            # If a datetime doesn't exist, then it's likely an all-day event
+            # According to the google api, date is in the format "yyyy-mm-dd"
 
-        self.start_datetime = parse(event["start"].get("dateTime", default_start_datetime))
-        self.end_datetime = parse(event["end"].get("dateTime", default_end_datetime))
-
+            # The mess that is the first paramter splits the string by "-"
+            # Then, it maps the array or strings to integers, after which it
+            # uses the splat operater to pass it to the first three paramters
+            # of datetime
+            self.start_datetime = datetime(*[int(x) for x in event["start"]["date"].split("-", 2)], 0, 0, 0)
+            self.end_datetime = datetime(*[int(x) for x in event["end"]["date"].split("-", 2)], 23, 59, 59)
+            self._allday = True
+            
         try:
             self.reccurence = parse_recurrence(event["reccurence"])
         except KeyError:
@@ -45,6 +58,34 @@ class GoogleEvent():
     
     def __repr__(self):
         return f"GoogleEvent(id: {self.id} summary:{self.summary} location:{self.location} description:{self.description} start_datetime:{self.start_datetime} end_datetime:{self.end_datetime} reccurence:{self.reccurence})"
+
+    @property
+    def is_allday(self) -> bool:
+        """
+        Returns true if the event is an all-day event
+        """
+        return self._allday
+
+    def to_ical_event(self) -> Event:
+        """
+        Returns this event as an iCalendar Event object
+        """
+        event = Event()
+        event.add("uid",            self._event["iCalUID"])
+        event.add("summary",        self.summary)
+        event.add("location",       self.location)
+        event.add("description",    self.description)
+        event.add("dtstart",        self.start_datetime)
+        event.add("dtend",          self.end_datetime)
+        return event
+
+    def to_ical(self) -> Calendar:
+        """
+        Returns this event as an iCalendar Calendar object
+        """
+        cal = Calendar()
+        cal.add_component(self.to_ical_event())
+        return cal
 
 class GoogleCalendar:
     """
@@ -78,7 +119,7 @@ class GoogleCalendar:
     def __repr__(self):
         return "GoogleCalendar(" + self.service + ", " + self.calendar_id + ")"
     
-    def get_event(self, event_id, api_params=dict(), **google_event_params) -> GoogleEvent:
+    def get_event(self, event_id, api_params=dict(), google_event_params=dict()) -> GoogleEvent:
         """
         Returns an event by it's id.
 
@@ -90,9 +131,10 @@ class GoogleCalendar:
         event = self.service.events().get(calendarId=self.calendar_id, eventId=event_id, **api_params).execute()
         return GoogleEvent(event, **google_event_params)
 
-    def get_events(self, **api_params) -> Generator[dict, None, None]:
+    def get_raw_events(self, api_params=dict()) -> Generator[dict, None, None]:
         """
         Returns a generator that can be used to iterate over all the events in the calendar.
+        Events are returned as-is from the API.
         """
         resp = self.service.events().list(calendarId=self.calendar_id, **api_params).execute()
         while True:
@@ -113,7 +155,7 @@ class GoogleCalendar:
         cal["summary"] = self.summary
         cal["description"] = self.description
 
-        for event in self.get_events(**api_params):
+        for event in self.get_raw_events(**api_params):
             i_event = Event()
             i_event.add("summary",      event["summary"])
             i_event.add("description",  event.get("description"))
