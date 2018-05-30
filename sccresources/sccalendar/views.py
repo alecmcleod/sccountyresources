@@ -116,6 +116,15 @@ def details(request, service=None, event_id=None):
     else:
         return render(request, '404.html')
 
+    print("Origin: " + str(origin))
+    print("Summary: " + str(event.summary))
+    print("Location: " + str(event.location))
+    print("Description: " + str(event.description))
+    print("Date: " + str(event.start_datetime.date))
+    print("Time: " + str(event.start_datetime.time))
+    print("Recurrence: " + str(event.reccurence))
+
+
     return render(request, 'details.html', context={'title': event.summary,
                                                     'location': event.location,
                                                     'description': event.description,
