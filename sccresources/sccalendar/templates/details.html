@@ -8,13 +8,17 @@
           <hr>
           <hr>
 
-            <div class=container>
+            <div class="container">
 
           <!-- Post Content -->
 
-            <div class=row style =  'margin: auto;width: 80%; padding: 10px;'>
+            <div class="row" style ="margin: auto;width: 80%; padding: 10px;">
 
-            <div class=col-sm-6 >
+          	<div class="col-sm-6">
+         	 <div>
+         	 	 <h2>{{date}} {{time}}</h2>
+         	 	 <h3>{{location}}</h3>
+         	 </div>
            <div>
              <h2>{{date}} {{time}}</h2>
              <h3> {{location}}</h3>
@@ -53,6 +57,10 @@
             <button type="button" class="btn btn-primary">export to ical</button>
             <button type="button" class="btn btn-primary">export to google calendars</button>
           </div>
+      		<div class="col-sm-6" id="gmaps">
+                <script>doGeocode("{{location}}", "{{origin}}");</script>
+
+      		</div>
       </div>
 
 

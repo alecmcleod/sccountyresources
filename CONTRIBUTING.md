@@ -1,3 +1,13 @@
+# PhysicalTime `CONTRIBUTING`
+
+Pull requests & contributing
+---
+All pull requests of any sort are welcome! Any problems will help with bugs, as well as any potential features to be implemented to the application.
+
+Please have a look at `Contributor guidelines for developers` below for more niche topics on Python/JavaScript/HTML/CSS styling. For the more general case, simply follow the general formatting and constructs of the current codebase.
+
+All contributions are welcome, simply make a pull request [here](https://github.com/alecmcleod/sccountyresources/issues). :sunny::sunglasses:
+
 Contributor guidelines for developers
 ---
 * Author headers at the beginning of each class file. For example,
