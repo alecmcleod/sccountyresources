@@ -124,18 +124,17 @@ def event_ical_download(request, service=None, event_id=None):
     else:
         raise Http404("Service does not exist.")
 
-def calendar_ical_download(request):
+def calendar_ical_download(request, service=None):
     """
     Returns an ical file for a whole calendar
     """
-    services = request.GET.get('services')
-    if services is None:
+    if service is None:
         # If there are no search parameters, redirect to home page
         return HttpResponseRedirect('/')
-    elif services not in var_map:
+    elif service not in var_map:
         # Requested service doesn't exist
         raise Http404("Service does not exist.")
     else:
-        response = HttpResponse(var_map[services].to_ical(), content_type='text/calendar')
+        response = HttpResponse(var_map[service].to_ical(), content_type='text/calendar')
         response['Content-Disposition'] = 'attachment; filename=calendar.ics'
         return response
