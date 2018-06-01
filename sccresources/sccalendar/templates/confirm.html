@@ -1,0 +1,37 @@
+{% extends "base_generic.html" %} {% block content %}
+
+<p> {{message}} </p>
+
+{% if form %}
+<form id='subscribeform' action="/calendar/confirm/result/" method="post" >
+{% csrf_token %}
+<p> {{form}} </p>
+{% for key, value in unseen_data.items %}
+<input type="hidden" name={{key}} value={{value}} >
+{% endfor %}
+<input type="submit" value="Confirm Phone Number" class="btn btn-primary"/>
+
+{% else %}
+
+	{% if action %}
+		<button   onclick = 'window.history.go(-2); return false;' class="btn btn-primary"/>{{title}}</button>
+	{% endif %}
+
+
+	{% if sec_action %}
+
+		<form id='jash' action="{{sec_action}}" method="post" >
+		{% csrf_token %}
+
+		{% for key, value in unseen_data.items %}
+		<input type="hidden" name={{key}} value={{value}} >
+		{% endfor %}
+		<br>
+		<br>
+		<input type="submit" value="{{title2}}" class="btn btn-primary"/>
+
+	{% endif %}
+
+{% endif %}
+
+{% endblock %}

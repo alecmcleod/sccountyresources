@@ -1,5 +1,6 @@
-from django import forms
 
+from django import forms
+from phonenumber_field.formfields import PhoneNumberField
 
 class SearchForm(forms.Form):
 
@@ -14,4 +15,9 @@ class SearchForm(forms.Form):
 
 class SubscribeForm(forms.Form):
 
-	phone_number = '+1' + str(forms.CharField(required=True,max_length=10,min_length=10))
+	phone_number = PhoneNumberField(max_length=15, min_length=10,\
+								label='Enter Phone Number' , required=True)
+
+class ConfirmForm(forms.Form):
+
+	code = forms.CharField(widget=forms.NumberInput, max_length=4, min_length=4, required=True)

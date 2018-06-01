@@ -20,29 +20,44 @@
          	 	 <h3>{{location}}</h3>
          	 </div>
            <div>
-             <h2>{{date}} {{time}}</h2>
-             <h3> {{location}}</h3>
-           </div>
-           <div>
 
            </div>
+         	 <br>
+         	 <p>{{description}}</p>
            <br>
-           <p>{{description}}</p>
 
-          </div>
+            {% block javascript %}
+
+
+           <br>
+            <form id='subscribeform' action="/calendar/confirm/" method="post" >
+            {% csrf_token %}
+            
+            {% for key, value in hidden_data.items %}
+            <input type="hidden" name={{key}} value='{{value}}' >
+            {% endfor %}
+            
+            {{form}}
+            <br>
+            <br>
+
+            <script type="text/javascript">
+  
+            
+            </script>
+
+            <input type="submit" value="Get Text Notifications" class="btn btn-primary"/>
+      		  </div >
+
+             
+
+              {% endblock %}
+
           <!-- google map -->
-          <div class=col-sm-6>
-        {% if origin %}
-          <iframe
-          width="300"
-          height="300"
-          frameborder="0" style="border:0"
-          src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g
-              &origin={{origin}}
-              &destination={{location}}"
-          allowfullscreen>
-          </iframe>
-        {% else %}
+          <br><br>
+      		<div id = "map" class='col-sm-6' style="height:'100px'">
+          <br><br>
+				  {% if origin %}
           <iframe
           width="300"
           height="300"
@@ -50,9 +65,17 @@
           src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g
           &q={{location}}" allowfullscreen>
           </iframe>
-        {% endif %}
-            <br>
-            <br>
+				{% else %}
+					<iframe
+					width="300"
+					height="300"
+					frameborder="0" style="border:0"
+					src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g
+					&q={{location}}" allowfullscreen>
+					</iframe>
+				{% endif %}
+      			<br>
+      			<br>
             <!-- export buttons -->
             <button type="button" class="btn btn-primary">export to ical</button>
             <button type="button" class="btn btn-primary">export to google calendars</button>

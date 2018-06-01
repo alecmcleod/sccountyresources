@@ -8,5 +8,3 @@ class Event(models.Model):
 class Number(models.Model):
 	event = models.ForeignKey(Event, on_delete=models.CASCADE)
 	number = models.CharField(max_length=13)
-	
-
