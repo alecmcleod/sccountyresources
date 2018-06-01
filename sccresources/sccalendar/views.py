@@ -2,7 +2,7 @@ import calendar
 from datetime import datetime, time, timedelta
 from typing import Dict
 import googlemaps
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render
 
 from . import google_auth
@@ -64,7 +64,7 @@ def search(request):
         return HttpResponseRedirect('/')
     elif services not in var_map:
         # Requested service doesn't exist
-        return render(request, '404.html')
+        raise Http404("Service does not exist.")
     else:
         if request.GET.get('locations') is not None:
             # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
@@ -94,16 +94,7 @@ def details(request, service=None, event_id=None):
         }
         event = var_map[service].get_event(event_id, dict(), google_event_params)
     else:
-        return render(request, '404.html')
-
-    print("Origin: " + str(origin))
-    print("Summary: " + str(event.summary))
-    print("Location: " + str(event.location))
-    print("Description: " + str(event.description))
-    print("Date: " + str(event.start_datetime.date))
-    print("Time: " + str(event.start_datetime.time))
-    print("Recurrence: " + str(event.reccurence))
-
+        raise Http404("Service does not exist.")
 
     return render(request, 'details.html', context={'title': event.summary,
                                                     'location': event.location,
@@ -113,3 +104,38 @@ def details(request, service=None, event_id=None):
                                                     'recurrence': event.reccurence,
                                                     'origin': origin
                                                     })
+
+def event_ical_download(request, service=None, event_id=None):
+    """
+    Returns an ical file for a spefic event.
+    """
+    if service in var_map:
+        google_event_params = {
+            'default_summary': '',
+            'default_reccurence': '',
+            'default_location': '1515 Ocean St, Santa Cruz, CA 95060',
+            'default_description': ''
+        }
+        event = var_map[service].get_event(event_id, dict(), google_event_params)
+
+        response = HttpResponse(event.to_ical(), content_type='text/calendar')
+        response['Content-Disposition'] = 'attachment; filename=calendar.ics'
+        return response
+    else:
+        raise Http404("Service does not exist.")
+
+def calendar_ical_download(request):
+    """
+    Returns an ical file for a whole calendar
+    """
+    services = request.GET.get('services')
+    if services is None:
+        # If there are no search parameters, redirect to home page
+        return HttpResponseRedirect('/')
+    elif services not in var_map:
+        # Requested service doesn't exist
+        raise Http404("Service does not exist.")
+    else:
+        response = HttpResponse(var_map[services].to_ical(), content_type='text/calendar')
+        response['Content-Disposition'] = 'attachment; filename=calendar.ics'
+        return response
