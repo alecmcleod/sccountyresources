@@ -49,8 +49,8 @@ def search(request):
         """
         # the key defines what value is used to sort by in the event dictionaries. If it is missing it will return none
         def event_key(event):
-            missing_distance = (event.distance_value is None)
-            return missing_distance, event.distance_value if not missing_distance else None
+            missing_distance = (event.distance is None)
+            return missing_distance, event.distance if not missing_distance else None
         list.sort(events, key=event_key)
 
     # Perform the get request to google api for the appropriate service and location
@@ -68,7 +68,7 @@ def search(request):
     else:
         if request.GET.get('locations') is not None:
             # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
-            events_today = gmaps.convert_events(request.GET.get('locations'), var_map[services].get_events(api_params))
+            events_today = gmaps.convert_events(request.GET.get('locations'), list(var_map[services].get_events(api_params)))
             sort_events(events_today)
 
     return render(

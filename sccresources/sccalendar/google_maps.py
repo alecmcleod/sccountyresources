@@ -11,13 +11,8 @@ class GoogleDistanceEvent(GoogleEvent):
     """
     Extention of a GoogleEvent that includes a distance.
     """
-    def __init__(self, event, distance, distance_text, 
-                default_summary = None, 
-                default_location = None, 
-                default_description = None,
-                default_reccurence = None):
-
-                super(event, default_summary, default_location, default_description, default_reccurence)
+    def __init__(self, event, distance, distance_text, defaults=dict()):
+                super().__init__(event, **defaults)
                 self.distance = distance
                 self.distance_text = distance_text
     
@@ -26,7 +21,7 @@ class GoogleDistanceEvent(GoogleEvent):
         """
         Constructs a new instance of GoogleDistanceEvent given a GoogleEvent and distance paramters
         """
-        return cls(google_event.event, distance, distance_text, **google_event._defaults)
+        return cls(google_event._event, distance, distance_text, defaults=google_event._defaults)
     
     @classmethod
     def from_event_and_api(cls, google_event, element):
@@ -34,7 +29,7 @@ class GoogleDistanceEvent(GoogleEvent):
         Constructs a new instance of GoogleDistanceEvent given a GoogleEvent 
         and an element from the Distance Matrix API
         """
-        return cls.from_google_event(google_event, element[0]['distance']['value'], element['distance']['text'])
+        return cls.from_google_event(google_event, element['distance']['value'], element['distance']['text'])
 
 class GoogleMaps:
     """
