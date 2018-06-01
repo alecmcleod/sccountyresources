@@ -49,30 +49,9 @@ def search(request):
         """
         # the key defines what value is used to sort by in the event dictionaries. If it is missing it will return none
         def event_key(event):
-            missing_distance = (event.get('distance_value') is None)
-            return missing_distance, event.get('distance_value') if not missing_distance else None
+            missing_distance = (event.distance_value is None)
+            return missing_distance, event.distance_value if not missing_distance else None
         list.sort(events, key=event_key)
-
-    def add_distance(events):
-        """
-        Adds distance_value (int) and distance_text (string) to all events in an event list. Modifies list in place and
-        has no return value. Also sorts list by distance
-        :param events: list of event objects to be modified
-        """
-        for event in events:
-            # Brackets are necessary around origins and destinations because the google API expects a list
-            api_params = {'origins': [request.GET.get('locations')],
-                          'destinations': [event.get('location')],
-                          'units': 'imperial'}
-            # Ensure origin and destination have values
-            if not request.GET.get('locations') or not event.get('location'):
-                return
-            else:
-                resp = gmaps.get_distance(**api_params)
-                # If request is successful, assign the appropriate values in each event dict
-                if resp['Success'] == 'OK':
-                    event['distance_text'] = resp['distance_text']
-                    event['distance_value'] = resp['distance_value']
 
     # Perform the get request to google api for the appropriate service and location
     now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
@@ -87,9 +66,10 @@ def search(request):
         # Requested service doesn't exist
         return render(request, '404.html')
     else:
-        events_today = list(var_map[services].get_raw_events(api_params))
-        add_distance(events_today)
-        sort_events(events_today)
+        if request.GET.get('locations') is not None:
+            # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
+            events_today = gmaps.convert_events(request.GET.get('locations'), var_map[services].get_events(api_params))
+            sort_events(events_today)
 
     return render(
         request,
