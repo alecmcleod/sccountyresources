@@ -1,9 +1,41 @@
+from .google_calendar import GoogleEvent
 import googlemaps
 import json
+import sys
 
 """
 Package for interacting with the google maps API and google calendar events
 """
+
+class GoogleDistanceEvent(GoogleEvent):
+    """
+    Extention of a GoogleEvent that includes a distance.
+    """
+    def __init__(self, event, distance, distance_text, 
+                default_summary = None, 
+                default_location = None, 
+                default_description = None,
+                default_reccurence = None):
+
+                super(event, default_summary, default_location, default_description, default_reccurence)
+                self.distance = distance
+                self.distance_text = distance_text
+    
+    @classmethod
+    def from_google_event(cls, google_event, distance, distance_text):
+        """
+        Constructs a new instance of GoogleDistanceEvent given a GoogleEvent and distance paramters
+        """
+        return cls(google_event.event, distance, distance_text, **google_event._defaults)
+    
+    @classmethod
+    def from_event_and_api(cls, google_event, element):
+        """
+        Constructs a new instance of GoogleDistanceEvent given a GoogleEvent 
+        and an element from the Distance Matrix API
+        """
+        return cls.from_google_event(google_event, element[0]['distance']['value'], element['distance']['text'])
+
 class GoogleMaps:
     """
     Represents a connection to the google calendar API.
@@ -33,5 +65,25 @@ class GoogleMaps:
             return {'distance_value': distance_value, 'distance_text': distance_text, 'Success': 'OK'}
         else:
             return {'distance_value': None, 'distance_text': None, 'Success': None}
+    
+    def convert_events(self, origin, events_list):
+        """
+        Converts a list of GoogleEvents to GoogleDistanceEvents, given a single origin.
 
+        Raises an IOError when the API returns a non-OK status
+        """
+        resp = json.loads(json.dumps(self.service.distance_matrix(
+            origins=[origin], destinations=[str(e.location) for e in events_list], units='imperial'
+        )))
 
+        # TODO: Might be a good idea to add a little bit more specific error handling
+        if not resp['status'] == "OK":
+            print("Recieved error from Goole Distance Matrix API: " + resp['status'])
+            raise IOError("Recieved error from Goole Distance Matrix API: " + resp['status'])
+        
+        elements = resp['rows'][0]['elements']
+        # First, combine the list of events and list of elements into a single list of ordered pairs
+        # Then, map over this list with GoogleDistanceEvent.from_event_and_api
+        # This creates a new list of GoogleDistanceEvents that we return
+        return [GoogleDistanceEvent.from_event_and_api(*e) for e in zip(events_list, elements)]
+            

@@ -29,6 +29,12 @@ class GoogleEvent():
                 default_description = None,
                 default_reccurence = None):
         self._event = event
+        self._defaults = {
+            "default_summary": default_summary, 
+            "default_location": default_location,
+            "default_description": default_description,
+            "default_reccurence": default_reccurence
+        }
 
         self.id = event.get("id")
         self.summary = event.get("summary", default_summary)
