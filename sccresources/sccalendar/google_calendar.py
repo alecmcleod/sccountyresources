@@ -2,7 +2,6 @@
 Package for working with Google Calendar and iCal
 """
 from . import google_auth
-from .utils import parse_recurrence
 from datetime import datetime
 from typing import Generator
 from icalendar import Calendar, Event
@@ -52,7 +51,7 @@ class GoogleEvent():
             self._allday = True
             
         try:
-            self.reccurence = parse_recurrence(event["reccurence"])
+            self.reccurence = event["recurrence"]
         except KeyError:
             self.reccurence = default_reccurence
     
