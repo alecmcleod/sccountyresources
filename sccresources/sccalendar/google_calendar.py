@@ -28,6 +28,12 @@ class GoogleEvent():
                 default_description = None,
                 default_reccurence = None):
         self._event = event
+        self._defaults = {
+            "default_summary": default_summary, 
+            "default_location": default_location,
+            "default_description": default_description,
+            "default_reccurence": default_reccurence
+        }
 
         self.id = event.get("id")
         self.summary = event.get("summary", default_summary)
@@ -145,6 +151,14 @@ class GoogleCalendar:
                 raise StopIteration()
             else:
                 resp = self.service.events().list(calendarId=self.calendar_id, pageToken=resp["nextPageToken"], **api_params).execute()
+    
+    def get_events(self, api_params=dict(), google_event_params=dict()) -> Generator[GoogleEvent, None, None]:
+        """
+        Wrapper around get_raw_events that returns a GoogleEvent instance of a dict
+        """
+        for e in self.get_raw_events(api_params=api_params):
+            yield GoogleEvent(e, **google_event_params)
+        raise StopIteration()
 
     def export_ical(self, **api_params) -> Calendar:
         """
