@@ -13,6 +13,17 @@ class GoogleCalendarTestCase(TestCase):
         self.service = get_service()
         self.calendar_id = "ucsc.edu_gn5gb46mq2mt6961h0g3jifakg@group.calendar.google.com"
 
+    def test_get_raw_events(self):
+        c = GoogleCalendar(self.service, self.calendar_id)
+
+        actual = list(c.get_raw_events(api_params={"singleEvents": True, 'orderBy': "startTime"}))
+
+        self.assertEqual("TEST", actual[0]["summary"])
+        self.assertEqual("TEST2", actual[1]["summary"])  
+        self.assertEqual("TEST3", actual[2]["summary"])  
+        self.assertEqual("Fuck", actual[3]["summary"])   
+        self.assertEqual("TEST4", actual[4]["summary"])
+
     def test_export_calendar(self):
         c = GoogleCalendar(self.service, self.calendar_id)
         ical = c.export_ical()
