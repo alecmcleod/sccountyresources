@@ -1,6 +1,7 @@
 import calendar
 from datetime import datetime, time, timedelta
 from typing import Dict
+from user_agents import parse
 import googlemaps
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -34,9 +35,11 @@ def index(request):
     )
 
 def calendars(request):
+    client_ua = parse(str(request.META['HTTP_USER_AGENT']))
     return render(
         request,
-        'calendars.html'
+        'calendars.html',
+        context={'is_mobile': client_ua.is_mobile}
     )
 
 
@@ -115,15 +118,6 @@ def details(request, service=None, event_id=None):
         event = var_map[service].get_event(event_id, dict(), google_event_params)
     else:
         return render(request, '404.html')
-
-    print("Origin: " + str(origin))
-    print("Summary: " + str(event.summary))
-    print("Location: " + str(event.location))
-    print("Description: " + str(event.description))
-    print("Date: " + str(event.start_datetime.date))
-    print("Time: " + str(event.start_datetime.time))
-    print("Recurrence: " + str(event.reccurence))
-
 
     return render(request, 'details.html', context={'title': event.summary,
                                                     'location': event.location,

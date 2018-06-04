@@ -16,16 +16,16 @@
 
 <!--
 	The dropdown menu, which the user may choose which between the "food", "clothing", and "drugs" calendars
--->
+  -->
 <div class="dropdown">
 	<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 	- Choose a calendar -
 	</button>
 	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <a class="dropdown-item" onclick="whichCalendar('food');">Food calendar</a>
-		<a class="dropdown-item" onclick="whichCalendar('drugs');">Drugs calendar</a>
-		<a class="dropdown-item" onclick="whichCalendar('health');">Health calendar</a>
-		<a class="dropdown-item" onclick="whichCalendar('shower');">Shower
+    <a class="dropdown-item" onclick="whichCalendar('food', '{{is_mobile}}');">Food calendar</a>
+    <a class="dropdown-item" onclick="whichCalendar('drugs', '{{is_mobile}}');">Drugs calendar</a>
+    <a class="dropdown-item" onclick="whichCalendar('health', '{{is_mobile}}');">Health calendar</a>
+    <a class="dropdown-item" onclick="whichCalendar('shower', '{{is_mobile}}');">Shower
       calendar</a>
 	</div>
 </div>
