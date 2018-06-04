@@ -26,7 +26,7 @@ gmaps = GoogleMaps('AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
 # Create your views here.
 def index(request):
     form = SearchForm(request.GET)
-
+    str(form)
     return render(
         request,
         'index.html',

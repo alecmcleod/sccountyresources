@@ -1,38 +1,17 @@
-{% extends "base_generic.html" %} {% block content %}
-<!--Author: Paul May-->
-<!--Based off of Start Bootstrap: Blog Post-->
-    <!-- Page Content -->
-    <div class="container">
-         <!-- Title -->
-          <h1 class="sm-4">{{title}}</h1>
-          <hr>
-          <hr>
-
-            <div class="container">
-
-          <!-- Post Content -->
-
-            <div class="row" style ="margin: auto;width: 80%; padding: 10px;">
-
-          	<div class="col-sm-6">
-         	 <div>
-         	 	 <h2>{{date}} {{time}}</h2>
-         	 	 <h3>{{location}}</h3>
-         	 </div>
-           <div>
-
-           </div>
-         	 <br>
-         	 <p>{{description}}</p>
-
-      		</div>
-          <!-- google map -->
-      		<div class="col-sm-6" id="gmaps">
-                <script>doGeocode("{{location}}", "{{origin}}");</script>
-
-      		</div>
-      </div>
-
-
-
+{% extends "base_generic.html" %}
+{% block content %}
+<div class="container">
+      <h1>{{title}}</h1>
+      <hr />
+      <hr />
+      <div class="container">
+ 	 	 <h2>{{date}} {{time}}</h2>
+ 	 	 <h3>{{location}}</h3>
+     	 <p>{{description}}</p>
+  	  </div>
+      <!-- google map -->
+  	  <div class="text-center" id="gmaps">
+          <script>doGeocode("{{location}}", "{{origin}}");</script>
+  	  </div>
+  </div>
 {% endblock %}
