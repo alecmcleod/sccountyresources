@@ -31,6 +31,49 @@
       {
           font-family:'Arvo', serif;
       }
+      a#header {
+        font-size: 2rem;
+      }
+      .navbar-brand span {
+        padding-right: 10px;
+      }
+      /* controls hamberger menu size */
+      .navbar-toggler {
+        font-size: 0.7rem;
+      }
+      @media (max-width: 470px) {
+        a.navbar-brand {
+          font-size: 1rem;
+        }
+        a#header {
+          font-size: 1.1rem;
+        }
+      }
+      @media (max-width: 420px) {
+        a.navbar-brand {
+          font-size: 0.9rem;
+        }
+        a#header {
+          font-size: 1.1rem;
+        }
+      }
+      @media (max-width: 370px) {
+        a.navbar-brand {
+          font-size: 0.8rem;
+        }
+        a#header {
+          font-size: 1rem;
+        }
+      }
+      @media (max-width: 345px) {
+        a.navbar-brand {
+          font-size: 0.7rem;
+        }
+        a#header {
+          font-size: 0.9rem;
+        }
+      }
+
   </style>
 </head>
 
@@ -44,14 +87,17 @@
         Navbar at the top of the page
     -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="/"><span>Santa Cruz County Resources</span></a>
       <a class="navbar-brand" href="/">
-          <!--
-            Loading static image from `static`
-          -->
+        <span>Santa Cruz County Resources</span>
+        <!--
+          Loading static image from `static`
+        -->
         {% load static %}
         <img src="{% static 'img/Santa_Cruz_County.png' %}" width="8%" height="8%"></img>
       </a>
+      <!-- <a class="navbar-brand" href="/">
+
+      </a> -->
 
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
