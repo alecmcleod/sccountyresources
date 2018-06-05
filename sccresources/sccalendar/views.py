@@ -1,7 +1,7 @@
 import calendar
 from datetime import datetime, time, timedelta
 from typing import Dict
-from user_agents import parse
+from user_agents import parse as ua_parse
 import googlemaps
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render
@@ -49,7 +49,7 @@ def index(request):
     )
 
 def calendars(request):
-    client_ua = parse(str(request.META['HTTP_USER_AGENT']))
+    client_ua = ua_parse(str(request.META['HTTP_USER_AGENT']))
     return render(
         request,
         'calendars.html',
