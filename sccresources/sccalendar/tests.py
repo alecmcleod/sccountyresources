@@ -78,7 +78,7 @@ class ViewsTestCase(TestCase):
         """
         Simple test of the static index page
         """
-        response = self.client.get("/")
+        response = self.client.get("/calendar/")
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response=response, template_name="index.html")
@@ -87,7 +87,7 @@ class ViewsTestCase(TestCase):
         """
         Simple test of the static calendars page.
         """
-        response = self.client.get("/calendars/")
+        response = self.client.get("/calendar/calendars/")
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response=response, template_name="calendars.html")
@@ -98,7 +98,7 @@ class ViewsTestCase(TestCase):
         returns 200, and the correct template for each one.
         """
         for service in self.services:
-            response = self.client.get("/search/", data={"services": service, "locations": "1515 Ocean St, Santa Cruz, CA 95060"})
+            response = self.client.get("/calendar/search/", data={"services": service, "locations": "1515 Ocean St, Santa Cruz, CA 95060"})
             self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response=response, template_name="search.html")
     
@@ -106,7 +106,7 @@ class ViewsTestCase(TestCase):
         """
         If an invalid service for the search page is given, then we should 404.
         """
-        response = self.client.get("/search/", data={"services": "this doesn't exist", "locations": "1515 Ocean St, Santa Cruz, CA 95060"})
+        response = self.client.get("/calendar/search/", data={"services": "this doesn't exist", "locations": "1515 Ocean St, Santa Cruz, CA 95060"})
 
         self.assertEqual(response.status_code, 404)
 
@@ -115,7 +115,7 @@ class ViewsTestCase(TestCase):
         If no location for the search page is given, then 400.
         """
         for service in self.services:
-            response = self.client.get("/search/", data={"services": service, "locations": None})
+            response = self.client.get("/calendar/search/", data={"services": service, "locations": None})
             self.assertEqual(response.status_code, 400)
 
     def test_details_expecting_200(self):
@@ -123,7 +123,7 @@ class ViewsTestCase(TestCase):
         Basic test of the details page. Ensures that urls are configured properly, and that
         given the correct paramters, it returns a 200 and the correct template.
         """
-        response = self.client.get("/details/FOOD/5tmc6k935cb5jmmqmnub4lhjjk_20180606T000000Z/")
+        response = self.client.get("/calendar/details/FOOD/5tmc6k935cb5jmmqmnub4lhjjk_20180606T000000Z/")
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response=response, template_name="details.html")
@@ -132,7 +132,7 @@ class ViewsTestCase(TestCase):
         """
         Tests to make sure the details view returns a 404 on an invalid service.
         """
-        response = self.client.get("/details/this doens't exist/5tmc6k935cb5jmmqmnub4lhjjk_20180606T000000Z/")
+        response = self.client.get("/calendar/details/this doens't exist/5tmc6k935cb5jmmqmnub4lhjjk_20180606T000000Z/")
 
         self.assertEqual(response.status_code, 404)
 
@@ -140,13 +140,13 @@ class ViewsTestCase(TestCase):
         """
         Tests to make sure the details view returns a 404 on an invalid id.
         """
-        response = self.client.get("/details/FOOD/aaaaaaaaaa")
+        response = self.client.get("/calendar/details/FOOD/aaaaaaaaaa")
 
         self.assertEqual(response.status_code, 404)
     
     def test_download_full_calendar_expecting_200(self):
         for service in self.services:
-            response = self.client.get(f"/download/calendar/{service}/")
+            response = self.client.get(f"/calendar/download/calendar/{service}/")
 
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "Content-Disposition", "attachment; filename=calendar.ics")
