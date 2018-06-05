@@ -14,10 +14,10 @@ class GoogleCalendarTestCase(TestCase):
         self.calendar_id = "ucsc.edu_gn5gb46mq2mt6961h0g3jifakg@group.calendar.google.com"
         self.calendar = GoogleCalendar(self.service, self.calendar_id)
         self.expected = [
-            {"summary": "TEST", "id": "10jn9doq1n2ckmth1b9ber7nk6", "start": {'dateTime': '2018-04-25T14:30:00-07:00'}},
-            {"summary": "TEST2", "id": "5tlt87hjb3hh6b7kaka1qv03jl", "start": {'dateTime': '2018-04-26T18:00:00-07:00'}},
-            {"summary": "TEST3", "id": "0gh0be37tqvganj9bgcudqp2ur", "start": {'dateTime': '2018-04-27T14:30:00-07:00'}},
-            {"summary": "TEST4", "id": "6eccmdp589r987pgc9c8kpf8kl", "start": {'dateTime': '2018-04-28T19:30:00-07:00'}}
+            {"summary": "TEST", "id": "10jn9doq1n2ckmth1b9ber7nk6", "start": {'dateTime': '2018-04-25T14:30:00-07:00'}, "end": {'dateTime': '2018-04-25T15:30:00-07:00'}},
+            {"summary": "TEST2", "id": "5tlt87hjb3hh6b7kaka1qv03jl", "start": {'dateTime': '2018-04-26T18:00:00-07:00'}, "end": {'dateTime': '2018-04-26T19:00:00-07:00'}},
+            {"summary": "TEST3", "id": "0gh0be37tqvganj9bgcudqp2ur", "start": {'dateTime': '2018-04-27T14:30:00-07:00'}, "end": {'dateTime': '2018-04-27T15:30:00-07:00'}},
+            {"summary": "TEST4", "id": "6eccmdp589r987pgc9c8kpf8kl", "start": {'dateTime': '2018-04-28T19:30:00-07:00'}, "end": {'dateTime': '2018-04-28T20:30:00-07:00'}}
         ]
 
     def test_get_raw_events(self):
