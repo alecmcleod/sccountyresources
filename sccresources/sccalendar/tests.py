@@ -18,19 +18,26 @@ class GoogleCalendarTestCase(TestCase):
         c = GoogleCalendar(self.service, self.calendar_id)
 
         actual = list(c.get_raw_events(api_params={"singleEvents": True, 'orderBy': "startTime"}))
+        expected = [
+            {"summary": "TEST", "id": "10jn9doq1n2ckmth1b9ber7nk6", "start": {'dateTime': '2018-04-25T14:30:00-07:00'}},
+            {"summary": "TEST2", "id": "5tlt87hjb3hh6b7kaka1qv03jl", "start": {'dateTime': '2018-04-26T18:00:00-07:00'}},
+            {"summary": "TEST3", "id": "0gh0be37tqvganj9bgcudqp2ur", "start": {'dateTime': '2018-04-27T14:30:00-07:00'}},
+            {"summary": "TEST4", "id": "6eccmdp589r987pgc9c8kpf8kl", "start": {'dateTime': '2018-04-28T19:30:00-07:00'}}
+        ]
 
-        self.assertEqual("TEST", actual[0]["summary"])
-        self.assertEqual("TEST2", actual[1]["summary"])  
-        self.assertEqual("TEST3", actual[2]["summary"])  
-        self.assertEqual("Fuck", actual[3]["summary"])   
-        self.assertEqual("TEST4", actual[4]["summary"])
+        # Ensure the quantity of items in actual match that of expected
+        self.assertEqual(len(actual), len(expected))
+
+        for a, e in zip(actual, expected):
+            # Asser that e is a subset of a
+            assert e.items() <= a.items()
 
     def test_export_calendar(self):
         c = GoogleCalendar(self.service, self.calendar_id)
         ical = c.export_ical()
 
         # Sanity Check
-        self.assertEqual(len(ical.subcomponents), 5)
+        self.assertEqual(len(ical.subcomponents), 4)
         
         # Export the calendar as a file
         directory = tempfile.mkdtemp()
