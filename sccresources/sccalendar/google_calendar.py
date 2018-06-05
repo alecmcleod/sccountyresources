@@ -2,7 +2,6 @@
 Package for working with Google Calendar and iCal
 """
 from . import google_auth
-from .utils import parse_recurrence
 from datetime import datetime
 from typing import Generator
 from icalendar import Calendar, Event
@@ -53,12 +52,12 @@ class GoogleEvent():
             # Then, it maps the array or strings to integers, after which it
             # uses the splat operater to pass it to the first three paramters
             # of datetime
-            self.start_datetime = datetime(*[int(x) for x in event["start"]["date"].split("-", 2)], 0, 0, 0)
+            self.start_datetime = datetime(*[int(x) for x in event["start"]["date"].split("-", 2)], 8, 0, 0)
             self.end_datetime = datetime(*[int(x) for x in event["end"]["date"].split("-", 2)], 23, 59, 59)
             self._allday = True
             
         try:
-            self.reccurence = parse_recurrence(event["reccurence"])
+            self.reccurence = event["recurrence"]
         except KeyError:
             self.reccurence = default_reccurence
     

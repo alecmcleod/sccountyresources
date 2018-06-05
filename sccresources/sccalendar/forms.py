@@ -1,5 +1,6 @@
-from django import forms
 
+from django import forms
+from phonenumber_field.formfields import PhoneNumberField
 
 class SearchForm(forms.Form):
 
@@ -11,3 +12,12 @@ class SearchForm(forms.Form):
 
     services = forms.ChoiceField(label='I need', choices=SERVICES_CHOICES, required=False, label_suffix="", widget=forms.Select(attrs={'id': 'services'}))
     locations = forms.ChoiceField(label='near', choices=LOCATION_CHOICES, required=False, label_suffix="", widget=forms.Select(attrs={'id':'locations'}))
+
+class SubscribeForm(forms.Form):
+
+	phone_number = PhoneNumberField(max_length=15, min_length=10,\
+								label='Enter Phone Number' , required=True)
+
+class ConfirmForm(forms.Form):
+
+	code = forms.CharField(widget=forms.NumberInput, max_length=4, min_length=4, required=True)
