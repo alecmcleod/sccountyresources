@@ -26,7 +26,7 @@ SECRET_KEY = 's9uupcpes^x2=djgh!q*6w(e5^x^n4v))6@_=7#6r@kag&p5!p'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['scccalendar.serveo.net','localhost']
+ALLOWED_HOSTS = ['scccalendar.serveo.net','localhost', '127.0.0.1']
 
 
 # Application definition
