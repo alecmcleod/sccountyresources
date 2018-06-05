@@ -48,11 +48,15 @@ def index(request):
     )
 
 def calendars(request):
-    client_ua = ua_parse(str(request.META['HTTP_USER_AGENT']))
+    try:
+        is_mobile = ua_parse(str(request.META['HTTP_USER_AGENT'])).is_mobile
+    except:
+        is_mobile = False
+
     return render(
         request,
         'calendars.html',
-        context={'is_mobile': client_ua.is_mobile}
+        context={'is_mobile': is_mobile}
     )
 
 
