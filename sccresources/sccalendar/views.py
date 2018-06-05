@@ -72,7 +72,8 @@ def search(request):
         if request.GET.get('locations') is not None:
             # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
             events_today = gmaps.convert_events(request.GET.get('locations'), list(var_map[services].get_events(api_params)))
-            sort_events(events_today)
+            if events_today is not None:
+                sort_events(events_today)
 
     return render(
         request,
