@@ -8,24 +8,28 @@ from twilio.rest import Client
 
 
 """
+Author: Paul May
+Date: June , 4th, 2018
+
 Purpose:
 this class is a singular object that will be created on launch
 and shared between all modules. it is used to send sms notifications
 and reminders to users and provides a quick list of commands for 
 developers.
 
+
+
 ##TO DO##
-
-#this will not work
-
-make remind reset on recurrence.
 
 Note:
 
 background functions declared like this
 
-@background(schedule=5)
+@background(schedule=5) #5 seconds
 def start_schedule_thread():
+
+process_tasks must be running for them to send actual messages
+
 """
 
 

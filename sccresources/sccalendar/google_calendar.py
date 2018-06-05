@@ -52,7 +52,7 @@ class GoogleEvent():
             # Then, it maps the array or strings to integers, after which it
             # uses the splat operater to pass it to the first three paramters
             # of datetime
-            self.start_datetime = datetime(*[int(x) for x in event["start"]["date"].split("-", 2)], 0, 0, 0)
+            self.start_datetime = datetime(*[int(x) for x in event["start"]["date"].split("-", 2)], 8, 0, 0)
             self.end_datetime = datetime(*[int(x) for x in event["end"]["date"].split("-", 2)], 23, 59, 59)
             self._allday = True
             
