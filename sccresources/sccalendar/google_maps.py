@@ -79,11 +79,11 @@ class GoogleMaps:
         elements = resp['rows'][0]['elements']
 
         # Error-checking
-        if elements['status'] == "NOT_FOUND":
-            raise ValueError('Could not find locations of values given.')
-        elif elements['status'] != "OK":
-            print('Recieved elements error from Googe Distance Matrix API: ' + elements['status'])
-            raise IOError('Recieved elements error from Googe Distance Matrix API: ' + elements['status'])
+        for element in elements:
+            if element['status'] == "NOT_FOUND":
+                raise ValueError('Could not find locations of values given.')
+            elif element['status'] != "OK":
+                raise IOError('Recieved elements error from Googe Distance Matrix API: ' + elements['status'])
 
         # First, combine the list of events and list of elements into a single list of ordered pairs
         # Then, map over this list with GoogleDistanceEvent.from_event_and_api

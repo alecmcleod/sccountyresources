@@ -94,8 +94,8 @@ def search(request):
             # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
             events_today = gmaps.convert_events(locations, list(var_map[services].get_events(api_params)))
             sort_events(events_today)
-        except ValueError as e:
-            raise Http404("Invalid location.")
+        except ValueError:
+            return HttpResponseBadRequest("<h1>400 Bad Request</h1><p>Invalid location.</p>")
 
         return render(
             request,
