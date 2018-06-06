@@ -1,26 +1,25 @@
 import calendar
+import random
 from datetime import datetime, time, timedelta
 from typing import Dict
-from user_agents import parse as ua_parse
+from urllib import parse
+
 import googlemaps
-from django.http import HttpResponseRedirect, Http404, HttpResponse
+import phonenumbers
+from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
-from . import models
-from . import google_auth
-from .forms import SearchForm
+from googleapiclient.errors import HttpError as GoogleHttpError
+from phonenumbers import NumberParseException
+from user_agents import parse as ua_parse
+
+from . import google_auth, models
+from .forms import ConfirmForm, SearchForm, SubscribeForm
 from .google_calendar import GoogleCalendar
 from .google_maps import GoogleMaps
-from .forms import SearchForm, SubscribeForm , ConfirmForm
 from .modules import sms
-from .modules.sms import LessThanHour , AlreadySubscribed ,NullSubscriptionArgument
-from .utils import to_sent, parse_recurrence, to_standard
-from urllib import parse
-import random
-import phonenumbers
-from phonenumbers import NumberParseException
-import calendar
-import googlemaps
-
+from .modules.sms import (AlreadySubscribed, LessThanHour,
+                          NullSubscriptionArgument)
+from .utils import parse_recurrence, to_sent, to_standard
 
 # Calendar ID variables
 FOOD_CAL_ID = 'hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com'
@@ -48,11 +47,15 @@ def index(request):
     )
 
 def calendars(request):
-    client_ua = ua_parse(str(request.META['HTTP_USER_AGENT']))
+    try:
+        is_mobile = ua_parse(str(request.META['HTTP_USER_AGENT'])).is_mobile
+    except:
+        is_mobile = False
+
     return render(
         request,
         'calendars.html',
-        context={'is_mobile': client_ua.is_mobile}
+        context={'is_mobile': is_mobile}
     )
 
 
@@ -80,19 +83,25 @@ def search(request):
         return HttpResponseRedirect('/')
     elif services not in var_map:
         # Requested service doesn't exist
-        raise Http404("Service does not exist.")
+        raise Http404('Service does not exist.')
     else:
-        if request.GET.get('locations') is not None:
-            # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
-            events_today = gmaps.convert_events(request.GET.get('locations'), list(var_map[services].get_events(api_params)))
-            if events_today is not None:
-                sort_events(events_today)
+        locations = request.GET.get('locations')
 
-    return render(
-        request,
-        'search.html',
-        context={'events': events_today, 'origin': request.GET.get('locations'), 'service': request.GET.get('services')}
-    )
+        if locations is None:
+            return HttpResponseBadRequest("<h1>400 Bad Request</h1><p>No location was provided for search</p>")
+
+        try:
+            # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
+            events_today = gmaps.convert_events(locations, list(var_map[services].get_events(api_params)))
+            sort_events(events_today)
+        except ValueError:
+            return HttpResponseBadRequest("<h1>400 Bad Request</h1><p>Invalid location.</p>")
+
+        return render(
+            request,
+            'search.html',
+            context={'events': events_today, 'origin': request.GET.get('locations'), 'service': request.GET.get('services')}
+        )
 
 def subscribe(request):
 
@@ -242,7 +251,6 @@ def details(request, service=None, event_id=None):
 
     origin = request.GET.get('locations')
 
-
     if service in var_map:
         google_event_params = {
             'default_summary': '',
@@ -250,13 +258,16 @@ def details(request, service=None, event_id=None):
             'default_location': '1515 Ocean St, Santa Cruz, CA 95060',
             'default_description': ''
         }
-        event = var_map[service].get_event(event_id, dict(), google_event_params)
+
+        try:
+            event = var_map[service].get_event(event_id, dict(), google_event_params)
+        except GoogleHttpError as e:
+            if e.resp['status'] == '404':
+                raise Http404('Event not found.')
     else:
-        raise Http404("Service does not exist.")
+        raise Http404('Service does not exist.')
 
     form = SubscribeForm(request.POST)
-
-    print(event.reccurence)
     
     hidden_data = {'event_id':event_id, 'cal_id':cal_id_map[service],\
     'title':event.summary,'date':str(event.start_datetime.date()),\

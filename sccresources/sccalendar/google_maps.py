@@ -67,18 +67,24 @@ class GoogleMaps:
 
         Raises an IOError when the API returns a non-OK status
         """
-        if not events_list:
-            return None
         resp = json.loads(json.dumps(self.service.distance_matrix(
             origins=[origin], destinations=[str(e.location) for e in events_list], units='imperial'
         )))
 
         # TODO: Might be a good idea to add a little bit more specific error handling
         if not resp['status'] == "OK":
-            print("Recieved error from Goole Distance Matrix API: " + resp['status'])
-            raise IOError("Recieved error from Goole Distance Matrix API: " + resp['status'])
-        
+            print('Recieved error from Google Distance Matrix API: ' + resp['status'])
+            raise IOError('Recieved error from Goole Distance Matrix API: ' + resp['status'])
+
         elements = resp['rows'][0]['elements']
+
+        # Error-checking
+        for element in elements:
+            if element['status'] == "NOT_FOUND":
+                raise ValueError('Could not find locations of values given.')
+            elif element['status'] != "OK":
+                raise IOError('Recieved elements error from Googe Distance Matrix API: ' + elements['status'])
+
         # First, combine the list of events and list of elements into a single list of ordered pairs
         # Then, map over this list with GoogleDistanceEvent.from_event_and_api
         # This creates a new list of GoogleDistanceEvents that we return
