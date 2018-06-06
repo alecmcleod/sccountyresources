@@ -10,7 +10,7 @@ class SearchForm(forms.Form):
     LOCATION_CHOICES = (('', ''), ('Santa Cruz, CA', 'Santa Cruz'), ('Watsonville, CA', 'Watsonville'), ('Scotts Valley, CA', 'Scotts Valley'),
                         ('Felton, CA', 'Felton'), ('Boulder Creek, CA', 'Boulder Creek'), ('Davenport, CA', 'Davenport'))
 
-    services = forms.ChoiceField(label='I need', choices=SERVICES_CHOICES, required=True, label_suffix="", widget=forms.Select(attrs={'id': 'services'}), error_messages={'required': ''})
+    services = forms.ChoiceField(label='I need', choices=SERVICES_CHOICES, required=True, label_suffix="", widget=forms.Select(attrs={'id': 'services'}))
     locations = forms.ChoiceField(label='near', choices=LOCATION_CHOICES, required=False, label_suffix="", widget=forms.Select(attrs={'id':'locations'}))
 
 
