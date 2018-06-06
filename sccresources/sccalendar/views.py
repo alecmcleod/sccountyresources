@@ -256,10 +256,10 @@ def details(request, service=None, event_id=None):
         try:
             event = var_map[service].get_event(event_id, dict(), google_event_params)
         except GoogleHttpError as e:
-            if e.resp["status"] == 404:
-                raise Http404("Event not found.")
+            if e.resp['status'] == '404':
+                raise Http404('Event not found.')
     else:
-        raise Http404("Service does not exist.")
+        raise Http404('Service does not exist.')
 
     form = SubscribeForm(request.POST)
     
