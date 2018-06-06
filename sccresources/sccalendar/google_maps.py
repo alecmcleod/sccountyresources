@@ -67,8 +67,6 @@ class GoogleMaps:
 
         Raises an IOError when the API returns a non-OK status
         """
-        if not events_list:
-            return None
         resp = json.loads(json.dumps(self.service.distance_matrix(
             origins=[origin], destinations=[str(e.location) for e in events_list], units='imperial'
         )))

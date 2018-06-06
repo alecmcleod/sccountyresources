@@ -6,7 +6,7 @@ from urllib import parse
 
 import googlemaps
 import phonenumbers
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
 from googleapiclient.errors import HttpError as GoogleHttpError
 from phonenumbers import NumberParseException
@@ -83,13 +83,16 @@ def search(request):
         return HttpResponseRedirect('/')
     elif services not in var_map:
         # Requested service doesn't exist
-        raise Http404("Service does not exist.")
+        raise Http404('Service does not exist.')
     else:
-        if request.GET.get('locations') is not None:
-            # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
-            events_today = gmaps.convert_events(request.GET.get('locations'), list(var_map[services].get_events(api_params)))
-            if events_today is not None:
-                sort_events(events_today)
+        locations = request.GET.get('locations')
+
+        if locations is None:
+            return HttpResponseBadRequest("<h1>400 Bad Request</h1><p>No location was provided for search</p>")
+
+        # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
+        events_today = gmaps.convert_events(locations, list(var_map[services].get_events(api_params)))
+        sort_events(events_today)
 
     return render(
         request,

@@ -115,7 +115,12 @@ class ViewsTestCase(TestCase):
         If no location for the search page is given, then 400.
         """
         for service in self.services:
-            response = self.client.get("/calendar/search/", data={"services": service, "locations": None})
+            response = self.client.get("/calendar/search/", data={"services": service})
+            self.assertEqual(response.status_code, 400)
+
+    def test_search_given_invalid_location_expecting_400(self):
+        for service in self.services:
+            response = self.client.get("/calendar/search/", data={"services": service, "locations": "Invalid"})
             self.assertEqual(response.status_code, 400)
 
     def test_details_expecting_200(self):
