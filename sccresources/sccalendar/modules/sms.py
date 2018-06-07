@@ -110,7 +110,7 @@ def add_reminder(event_id,cal_id,date,time,rrule,title,phone_number):
 			seconds = 1
 
 		print('scheduling new event in ', seconds, ' seconds')
-		__remind(event_id, cal_id, iso, title, schedule=seconds)
+		__remind(event_id, cal_id, iso, title, schedule=seconds-3600)
 		event.save()
 
 		if seconds <= 3600:
