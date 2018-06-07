@@ -82,6 +82,13 @@ class GoogleEvent():
         event.add("description",    self.description)
         event.add("dtstart",        self.start_datetime)
         event.add("dtend",          self.end_datetime)
+
+        if event.get("reccurence"):
+            event.add("sequence", event["sequence"])
+            for i in event.get("reccurence"):
+                prop_name, v = i.split(":", max_split=1)
+                event[prop_name] = v
+        
         return event
 
     def to_ical(self) -> Calendar:
@@ -168,20 +175,6 @@ class GoogleCalendar:
         cal["summary"] = self.summary
         cal["description"] = self.description
 
-        for event in self.get_raw_events(**api_params):
-            i_event = Event()
-            i_event.add("summary",      event["summary"])
-            i_event.add("description",  event.get("description"))
-            i_event.add("uid",          event["iCalUID"])
-            i_event.add("dtstart",      parse(event["start"]["dateTime"]))
-            i_event.add("dtend",        parse(event["end"]["dateTime"]))
-            
-            if event.get("reccurence"):
-                i_event.add("sequence", event["sequence"])
-                for i in event.get("reccurence"):
-                    prop_name, v = i.split(":", max_split=1)
-                    i_event[prop_name] = v
-
-            cal.add_component(i_event)
-        
+        for event in self.get_events(api_params=api_params):
+            cal.add_component(event.to_ical_event())
         return cal
