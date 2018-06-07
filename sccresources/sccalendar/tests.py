@@ -110,13 +110,22 @@ class ViewsTestCase(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_search_given_no_location_expecing_400(self):
+    def test_search_given_no_location_expecting_200(self):
         """
-        If no location for the search page is given, then 400.
+        If no location for the search page is given, search should still work
         """
         for service in self.services:
             response = self.client.get("/calendar/search/", data={"services": service})
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 200)
+    
+    def test_search_given_empty_location_expecting_200(self):
+        """
+        Similar to  `test_search_given_no_location_expecting_200` except with the
+        empty string.
+        """
+        for service in self.services:
+            response = self.client.get("/calendar/search/", data={"services": service, "locations": ""})
+            self.assertEqual(response.status_code, 200)
 
     def test_search_given_invalid_location_expecting_400(self):
         for service in self.services:
