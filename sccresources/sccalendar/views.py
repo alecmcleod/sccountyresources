@@ -278,6 +278,8 @@ def details(request, service=None, event_id=None):
                                                     'date': event.start_datetime.date,
                                                     'time': event.start_datetime.time,
                                                     'recurrence': event.reccurence,
+                                                    'id': event_id,
+                                                    'service': service,
                                                     'origin': origin,
                                                     'form':form,
                                                     'hidden_data':hidden_data,
