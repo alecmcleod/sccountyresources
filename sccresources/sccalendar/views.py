@@ -326,6 +326,6 @@ def calendar_ical_download(request, service=None):
         # Requested service doesn't exist
         raise Http404("Service does not exist.")
     else:
-        response = HttpResponse(var_map[service].to_ical(), content_type='text/calendar')
+        response = HttpResponse(var_map[service].export_ical(), content_type='text/calendar')
         response['Content-Disposition'] = 'attachment; filename=calendar.ics'
         return response
