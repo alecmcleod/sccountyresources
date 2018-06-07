@@ -127,10 +127,10 @@ class ViewsTestCase(TestCase):
             response = self.client.get("/calendar/search/", data={"services": service, "locations": ""})
             self.assertEqual(response.status_code, 200)
 
-    def test_search_given_invalid_location_expecting_400(self):
+    def test_search_given_invalid_location_expecting_200(self):
         for service in self.services:
             response = self.client.get("/calendar/search/", data={"services": service, "locations": "Invalid"})
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 200)
 
     def test_details_expecting_200(self):
         """
@@ -154,7 +154,7 @@ class ViewsTestCase(TestCase):
         """
         Tests to make sure the details view returns a 404 on an invalid id.
         """
-        response = self.client.get("/calendar/details/FOOD/aaaaaaaaaa")
+        response = self.client.get("/calendar/details/FOOD/aaaaaaaaaa/")
 
         self.assertEqual(response.status_code, 404)
     
