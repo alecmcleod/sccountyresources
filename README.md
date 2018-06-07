@@ -16,7 +16,7 @@ days. SCCR will provide a calendar that will provide the closest and soonest ser
 particular category. If you need food, you will be able to enter your location, and it will provide
 you with the soonest open soup kitchen or food bank near your location.
 <center>Sincerely,</center>
-<center>The Santa Cruz County Resources team :trollface:</center>
+<center>The Santa Cruz County Resources team</center>
 
 ## Contents of the [Wiki](https://github.com/alecmcleod/sccountyresources/wiki/)
 ---
