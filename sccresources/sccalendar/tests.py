@@ -163,7 +163,7 @@ class ViewsTestCase(TestCase):
             response = self.client.get(f"/calendar/download/calendar/{service}/")
 
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, "Content-Disposition", "attachment; filename=calendar.ics")
+            self.assertEqual(response["Content-Disposition"], "attachment; filename=calendar.ics")
 
 class UtilsTestCase(TestCase):
     def test_to_sent(self):
