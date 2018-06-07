@@ -79,8 +79,8 @@
             <br>
             <br>
             <!-- export buttons -->
-            <button type="button" class="btn btn-primary">export to ical</button>
-            <button type="button" class="btn btn-primary">export to google calendars</button>
+            <a href="{% url 'download_event' service id %}" class="btn btn-primary">export to ical</a>
+            <a class="btn btn-primary">export to google calendars</a>
           </div>
       </div>
 {% endblock %}

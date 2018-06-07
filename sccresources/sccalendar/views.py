@@ -90,13 +90,10 @@ def search(request):
         # If no location is provided, don't apply distance to the event
         events_today = list(var_map[services].get_events(api_params))
     else:
-        try:
-            # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
-            events_today = gmaps.convert_events(locations, list(var_map[services].get_events(api_params)))
-            if events_today is not None:
-                sort_events(events_today)
-        except ValueError:
-            return HttpResponseBadRequest("<h1>400 Bad Request</h1><p>Invalid location.</p>")
+        # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
+        events_today = gmaps.convert_events(locations, list(var_map[services].get_events(api_params)))
+        if events_today is not None:
+            sort_events(events_today)
 
     return render(
         request,
@@ -281,6 +278,8 @@ def details(request, service=None, event_id=None):
                                                     'date': event.start_datetime.date,
                                                     'time': event.start_datetime.time,
                                                     'recurrence': event.reccurence,
+                                                    'id': event_id,
+                                                    'service': service,
                                                     'origin': origin,
                                                     'form':form,
                                                     'hidden_data':hidden_data,
