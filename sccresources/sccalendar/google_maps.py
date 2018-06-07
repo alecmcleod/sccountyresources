@@ -83,9 +83,9 @@ class GoogleMaps:
         elements = resp['rows'][0]['elements']
 
         # Error-checking
-        for element in elements:
+        for index, element in enumerate(elements):
             if element['status'] == "NOT_FOUND":
-                raise ValueError('Could not find locations of values given.')
+                elements[index] = {'distance': {'value': None, 'text': None}}
             elif element['status'] != "OK":
                 raise IOError('Recieved elements error from Googe Distance Matrix API: ' + elements['status'])
 
