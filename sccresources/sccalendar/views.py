@@ -78,18 +78,18 @@ def search(request):
     api_params = {'timeMin': now, 'timeMax': tomorrow, 'singleEvents': True, 'orderBy': "startTime"}
 
     services = request.GET.get('services')
+    locations = request.GET.get('locations')
+
     if services is None:
         # If there are no search parameters, redirect to home page
         return HttpResponseRedirect('/')
     elif services not in var_map:
         # Requested service doesn't exist
         raise Http404('Service does not exist.')
+    elif locations is None or len(locations) == 0:
+        # If no location is provided, don't apply distance to the event
+        events_today = list(var_map[services].get_events(api_params))
     else:
-        locations = request.GET.get('locations')
-
-        if locations is None:
-            return HttpResponseBadRequest("<h1>400 Bad Request</h1><p>No location was provided for search</p>")
-
         try:
             # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
             events_today = gmaps.convert_events(locations, list(var_map[services].get_events(api_params)))
@@ -98,11 +98,11 @@ def search(request):
         except ValueError:
             return HttpResponseBadRequest("<h1>400 Bad Request</h1><p>Invalid location.</p>")
 
-        return render(
-            request,
-            'search.html',
-            context={'events': events_today, 'origin': request.GET.get('locations'), 'service': request.GET.get('services')}
-        )
+    return render(
+        request,
+        'search.html',
+        context={'events': events_today, 'origin': request.GET.get('locations'), 'service': request.GET.get('services')}
+    )
 
 def subscribe(request):
 
