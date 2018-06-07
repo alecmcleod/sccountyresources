@@ -18,9 +18,6 @@ and reminders to users and provides a quick list of commands for
 developers.
 
 
-
-##TO DO##
-
 Note:
 
 background functions declared like this
@@ -109,10 +106,17 @@ def add_reminder(event_id,cal_id,date,time,rrule,title,phone_number):
 
 		seconds = one_hour_before(py_dt)
 
+		if seconds <= 3600:
+			seconds = 1
+
 		print('scheduling new event in ', seconds, ' seconds')
 		__remind(event_id, cal_id, iso, title, schedule=seconds)
 		event.save()
 
+		if seconds <= 3600:
+			return 'LTHE'
+		else:
+			return 'GOOD'
 
 	else:
 
@@ -123,8 +127,11 @@ def add_reminder(event_id,cal_id,date,time,rrule,title,phone_number):
 			number_set = [i.number for i in numbers]
 			print(number_set)
 			if new_number.number not in number_set:
-				new_number.save()
-				return
+				seconds = one_hour_before(py_dt)
+				if seconds <= 3600:
+					return 'LTHE'
+				else:
+					return 'GOOD'
 			else:
 				raise AlreadySubscribed
 		except AlreadySubscribed: #data base misses. 
@@ -173,9 +180,6 @@ def one_hour_before(datetime_obj):
 	now = datetime.now()
 	
 	seconds = (datetime_obj-now).total_seconds()
-
-	if seconds <= 3600:
-		seconds = 5
 
 	return int(seconds) 
 

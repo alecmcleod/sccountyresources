@@ -117,6 +117,8 @@ def subscribe(request):
 
     try:
         test_case = phonenumbers.parse(number,None)
+
+
     except NumberParseException:
         return render(request, 'confirm.html',\
         context = {'message': 'you entered an invalid number',
@@ -144,15 +146,17 @@ def subscribe(request):
                     'unseen_data':''})
 
     try:
-        sms.add_reminder(request.POST.get('event_id'),request.POST.get('cal_id'),\
+        resp = sms.add_reminder(request.POST.get('event_id'),request.POST.get('cal_id'),\
                     request.POST.get('date'),request.POST.get('time'),\
                     request.POST.get('rrule'),request.POST.get('title'),\
                     number)
 
     except LessThanHour:
         return render(request, 'confirm.html',\
-         context = {'message': 'Unable to register for\
-                    that event, it occurs in less than an hour',
+         context = {'message':
+                    'That event, it occurs in less than an hour. You are\
+                    signed up for future instances of this event.\
+                    You may enter your phone number again to unsubscibe.',
                     'title':'back',
                     'action':' ',
                     'unseen_data':unseen_data})
@@ -180,8 +184,7 @@ def subscribe(request):
     request.session['verification_code'] = the_secret_bean
 
     sms.send_sms(number,('your code is '+str(the_secret_bean)+' in the\
-    future you can text this number CANCEL to unsubscribe from all notifications'))
-
+future you can text this number CANCEL to unsubscribe from all notifications'))
 
     form = ConfirmForm(request.POST)
 
@@ -194,7 +197,7 @@ def subscribe(request):
                     enter it into the text box below',
         
         'unseen_data': unseen_data,
-
+        'resp':resp,
         })
 
 
@@ -209,12 +212,20 @@ def confirm(request):
                         request.POST.get('iso_date_time'),\
                         request.POST.get('number'))
 
+        if request.POST.get('resp') == 'LTHE':
+                        return render(request,'confirm.html' ,\
+        context = {'message': 'reminder confirmed. unfortunately\
+                        the event occurs in less than an hour.\
+                        you will notified at the next occurrance of this event',
+                        'action':' ',
+                        'title':'back'})
 
-        return render(request,'confirm.html' ,\
-        context = {'message': 'reminder confirmed. you will receive\
-                    notification one hour before the event.',
-                    'action':'',
-                    'title':'back'})
+        else:
+            return render(request,'confirm.html' ,\
+            context = {'message': 'reminder confirmed. you will receive\
+                        notification one hour before the event.',
+                        'action':' ',
+                        'title':'back'})
     else:
         
         return render(request,'confirm.html' ,\
