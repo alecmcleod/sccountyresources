@@ -13,7 +13,7 @@ from phonenumbers import NumberParseException
 from user_agents import parse as ua_parse
 
 from . import google_auth, models
-from .forms import ConfirmForm, SearchForm, SubscribeForm
+from .forms import ConfirmForm, SearchForm, SubscribeForm, DistanceFilterForm
 from .google_calendar import GoogleCalendar
 from .google_maps import GoogleMaps
 from .modules import sms
@@ -26,15 +26,16 @@ FOOD_CAL_ID = 'hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com'
 DRUG_CAL_ID = 'nu02uodssn6j0ij4o3l4rqv9dk@group.calendar.google.com'
 HEALTH_CAL_ID = 'vlqtpo7ig0mbvpmk91j8r736kk@group.calendar.google.com'
 SHOWER_CAL_ID = 'uk8elskt37v991sbe3k7qasu1k@group.calendar.google.com'
-FOOD_CAL    = GoogleCalendar(google_auth.get_service(), FOOD_CAL_ID)
-DRUG_CAL    = GoogleCalendar(google_auth.get_service(), DRUG_CAL_ID)
-HEALTH_CAL  = GoogleCalendar(google_auth.get_service(), HEALTH_CAL_ID)
-SHOWER_CAL  = GoogleCalendar(google_auth.get_service(), SHOWER_CAL_ID)
+FOOD_CAL = GoogleCalendar(google_auth.get_service(), FOOD_CAL_ID)
+DRUG_CAL = GoogleCalendar(google_auth.get_service(), DRUG_CAL_ID)
+HEALTH_CAL = GoogleCalendar(google_auth.get_service(), HEALTH_CAL_ID)
+SHOWER_CAL = GoogleCalendar(google_auth.get_service(), SHOWER_CAL_ID)
 # Maps keywords to Calendar variables
 var_map = {"DRUGS": DRUG_CAL, "FOOD": FOOD_CAL, "HEALTH": HEALTH_CAL, "SHOWER": SHOWER_CAL}
 cal_id_map = {"DRUGS": DRUG_CAL_ID, "FOOD": FOOD_CAL_ID, "HEALTH": HEALTH_CAL_ID, "SHOWER": SHOWER_CAL_ID}
 # Google maps variable
 gmaps = GoogleMaps('AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
+
 
 # Create your views here.
 def index(request):
@@ -45,6 +46,7 @@ def index(request):
         # Passes the contents of the brackets to the template
         context={'form': form},
     )
+
 
 def calendars(request):
     try:
@@ -60,17 +62,20 @@ def calendars(request):
 
 
 def search(request):
-
     def sort_events(events):
         """
         Sorts events in the event list by distance
         :param events: list to be sorted
         """
+
         # the key defines what value is used to sort by in the event dictionaries. If it is missing it will return none
         def event_key(event):
             missing_distance = (event.distance is None)
             return missing_distance, event.distance if not missing_distance else None
+
         list.sort(events, key=event_key)
+
+    distance_form = DistanceFilterForm(request.GET)
 
     # Perform the get request to google api for the appropriate service and location
     now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
@@ -82,6 +87,7 @@ def search(request):
 
     if services is None:
         # If there are no search parameters, redirect to home page
+        print(request.get_full_path())
         return HttpResponseRedirect('/')
     elif services not in var_map:
         # Requested service doesn't exist
@@ -98,11 +104,14 @@ def search(request):
     return render(
         request,
         'search.html',
-        context={'events': events_today, 'origin': request.GET.get('locations'), 'service': request.GET.get('services')}
+        context={'events': events_today,
+                 'origin': request.GET.get('locations'),
+                 'service': request.GET.get('services'),
+                 'distance_form': distance_form}
     )
 
-def subscribe(request):
 
+def subscribe(request):
     number = parse.unquote(request.POST.get('phone_number'))
 
     number = ''.join(filter(str.isdigit, number))
@@ -113,124 +122,120 @@ def subscribe(request):
         number = '+' + number
 
     try:
-        test_case = phonenumbers.parse(number,None)
+        test_case = phonenumbers.parse(number, None)
 
 
     except NumberParseException:
-        return render(request, 'confirm.html',\
-        context = {'message': 'you entered an invalid number',
-                    'action': ' ',
-                    'title':'back',
-                    'unseen_data':'none'})
-
+        return render(request, 'confirm.html', \
+                      context={'message': 'you entered an invalid number',
+                               'action': ' ',
+                               'title': 'back',
+                               'unseen_data': 'none'})
 
     date = datetime.strptime(request.POST.get('date'), '%Y-%m-%d').date()
     time = datetime.strptime(request.POST.get('time'), '%H:%M:%S').time()
 
-    iso_date_time = datetime.combine(date ,time).isoformat()
+    iso_date_time = datetime.combine(date, time).isoformat()
 
-    unseen_data = { 'event_id' : request.POST.get('event_id') ,
-                    'cal_id':request.POST.get('cal_id') ,
-                    'iso_date_time' : iso_date_time,
-                    'number' : number ,
-                    }
+    unseen_data = {'event_id': request.POST.get('event_id'),
+                   'cal_id': request.POST.get('cal_id'),
+                   'iso_date_time': iso_date_time,
+                   'number': number,
+                   }
 
     if not phonenumbers.is_valid_number(test_case):
-        return render(request, 'confirm.html',\
-        context = {'message': 'you entered an invalid number',
-                    'action': ' ',
-                    'title':'back',
-                    'unseen_data':''})
+        return render(request, 'confirm.html', \
+                      context={'message': 'you entered an invalid number',
+                               'action': ' ',
+                               'title': 'back',
+                               'unseen_data': ''})
 
     try:
-        resp = sms.add_reminder(request.POST.get('event_id'),request.POST.get('cal_id'),\
-                    request.POST.get('date'),request.POST.get('time'),\
-                    request.POST.get('rrule'),request.POST.get('title'),\
-                    number)
+        resp = sms.add_reminder(request.POST.get('event_id'), request.POST.get('cal_id'), \
+                                request.POST.get('date'), request.POST.get('time'), \
+                                request.POST.get('rrule'), request.POST.get('title'), \
+                                number)
 
     except LessThanHour:
-        return render(request, 'confirm.html',\
-         context = {'message':
-                    'That event, it occurs in less than an hour. You are\
-                    signed up for future instances of this event.\
-                    You may enter your phone number again to unsubscibe.',
-                    'title':'back',
-                    'action':' ',
-                    'unseen_data':unseen_data})
+        return render(request, 'confirm.html', \
+                      context={'message':
+                                   'That event, it occurs in less than an hour. You are\
+                                   signed up for future instances of this event.\
+                                   You may enter your phone number again to unsubscibe.',
+                               'title': 'back',
+                               'action': ' ',
+                               'unseen_data': unseen_data})
 
     except AlreadySubscribed:
-        return render(request, 'confirm.html' ,\
-         context = {'message': 'You are already subscribed to this event,\
+        return render(request, 'confirm.html', \
+                      context={'message': 'You are already subscribed to this event,\
                     would you like us to unsubscibe you from this\
                     event?',
-                    'action':' ','title':'Keep Subsciption',
-                    'sec_action':'/calendar/cancel/','title2':'Cancel Subscription',
-                    'unseen_data':unseen_data})
+                               'action': ' ', 'title': 'Keep Subsciption',
+                               'sec_action': '/calendar/cancel/', 'title2': 'Cancel Subscription',
+                               'unseen_data': unseen_data})
 
     except NullSubscriptionArgument:
-        return render(request,'confirm.html' ,\
-         context = {'message': 'there was an error processing your request',
-         'action':' ','title':'back',
-         'unseen_data':unseen_data})
+        return render(request, 'confirm.html', \
+                      context={'message': 'there was an error processing your request',
+                               'action': ' ', 'title': 'back',
+                               'unseen_data': unseen_data})
 
-
-    the_secret_bean = random.randrange(1000,9999)
+    the_secret_bean = random.randrange(1000, 9999)
 
     print('the secret code is : ', the_secret_bean)
-    
+
     request.session['verification_code'] = the_secret_bean
 
-    sms.send_sms(number,('your code is '+str(the_secret_bean)+' in the\
+    sms.send_sms(number, ('your code is ' + str(the_secret_bean) + ' in the\
 future you can text this number CANCEL to unsubscribe from all notifications'))
 
     form = ConfirmForm(request.POST)
 
-    return render(request, 'confirm.html',\
-        context = {
-        'form':form,
-        
-        'message':'You will receive a text with a 4 digit code\
+    return render(request, 'confirm.html', \
+                  context={
+                      'form': form,
+
+                      'message': 'You will receive a text with a 4 digit code\
                     to confirm your phone number, when you receive it please\
                     enter it into the text box below',
-        
-        'unseen_data': unseen_data,
-        'resp':resp,
-        })
+
+                      'unseen_data': unseen_data,
+                      'resp': resp,
+                  })
 
 
 def confirm(request):
-    
     entered_key = request.POST.get('code')
 
     if int(request.session['verification_code']) == int(entered_key):
 
-        sms.call_remind(request.POST.get('event_id'),\
-                        request.POST.get('cal_id'),\
-                        request.POST.get('iso_date_time'),\
+        sms.call_remind(request.POST.get('event_id'), \
+                        request.POST.get('cal_id'), \
+                        request.POST.get('iso_date_time'), \
                         request.POST.get('number'))
 
         if request.POST.get('resp') == 'LTHE':
-                        return render(request,'confirm.html' ,\
-        context = {'message': 'reminder confirmed. unfortunately\
+            return render(request, 'confirm.html', \
+                          context={'message': 'reminder confirmed. unfortunately\
                         the event occurs in less than an hour.\
                         you will notified at the next occurrance of this event',
-                        'action':' ',
-                        'title':'back'})
+                                   'action': ' ',
+                                   'title': 'back'})
 
         else:
-            return render(request,'confirm.html' ,\
-            context = {'message': 'reminder confirmed. you will receive\
+            return render(request, 'confirm.html', \
+                          context={'message': 'reminder confirmed. you will receive\
                         notification one hour before the event.',
-                        'action':' ',
-                        'title':'back'})
+                                   'action': ' ',
+                                   'title': 'back'})
     else:
-        
-        return render(request,'confirm.html' ,\
-        context = {'message': 'you entered the wrong code,\
-                    reenter your number if you wish to try again.',
-                    'action':' '
-                    ,'title':'back'})
 
+        return render(request, 'confirm.html', \
+                      context={'message': 'you entered the wrong code,\
+                    reenter your number if you wish to try again.',
+                               'action': ' '
+                          , 'title': 'back'})
 
 
 def unsubscribe(request):
@@ -239,18 +244,22 @@ def unsubscribe(request):
     iso_date_time = request.POST.get('iso_date_time')
     num = request.POST.get('number')
 
-    event = models.Event.objects.get(event_id=event_id, calendar_id = cal_id , \
-                                    iso_date_time=iso_date_time)
-    #args : event_id , phone number
+    event = models.Event.objects.get(event_id=event_id,
+                                     calendar_id=cal_id,
+                                     iso_date_time=iso_date_time)
+    # args : event_id , phone number
     sms.del_reminder(event, num)
-    return render(request,'confirm.html' ,\
-        context = {'message': 'you have been unsubscribed'})
+    return render(request,
+                  'confirm.html',
+                  context={'message': 'you have been unsubscribed'})
+
 
 def unsub_all(request):
-    #args : phonenumber
+    # args : phonenumber
     sms.unsubscribe()
-    return render(request,'confirm.html' ,\
-        context = {'message': 'you have been unsubscribed from all events'})
+    return render(request,
+                  'confirm.html',
+                  context={'message': 'you have been unsubscribed from all events'})
 
 
 def details(request, service=None, event_id=None):
@@ -277,11 +286,10 @@ def details(request, service=None, event_id=None):
         raise Http404('Service does not exist.')
 
     form = SubscribeForm(request.POST)
-    
-    hidden_data = {'event_id':event_id, 'cal_id':cal_id_map[service],\
-    'title':event.summary,'date':str(event.start_datetime.date()),\
-    'time':str(event.start_datetime.time()), 'rrule': event.reccurence}
-    
+
+    hidden_data = {'event_id': event_id, 'cal_id': cal_id_map[service],
+                   'title': event.summary, 'date': str(event.start_datetime.date()),
+                   'time': str(event.start_datetime.time()), 'rrule': event.reccurence}
 
     return render(request, 'details.html', context={'title': event.summary,
                                                     'location': event.location,
@@ -292,9 +300,10 @@ def details(request, service=None, event_id=None):
                                                     'id': event_id,
                                                     'service': service,
                                                     'origin': origin,
-                                                    'form':form,
-                                                    'hidden_data':hidden_data,
+                                                    'form': form,
+                                                    'hidden_data': hidden_data,
                                                     })
+
 
 def event_ical_download(request, service=None, event_id=None):
     """
@@ -314,6 +323,7 @@ def event_ical_download(request, service=None, event_id=None):
         return response
     else:
         raise Http404("Service does not exist.")
+
 
 def calendar_ical_download(request, service=None):
     """
