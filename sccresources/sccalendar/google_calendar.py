@@ -155,7 +155,7 @@ class GoogleCalendar:
 
             # Break condition
             if not resp.get("nextPageToken"):
-                raise StopIteration()
+                return
             else:
                 resp = self.service.events().list(calendarId=self.calendar_id, pageToken=resp["nextPageToken"], **api_params).execute()
     
@@ -165,7 +165,7 @@ class GoogleCalendar:
         """
         for e in self.get_raw_events(api_params=api_params):
             yield GoogleEvent(e, **google_event_params)
-        raise StopIteration()
+        return
 
     def export_ical(self, **api_params) -> Calendar:
         """
