@@ -1,6 +1,7 @@
 import calendar
 import random
-from datetime import datetime, time, timedelta
+from datetime import time, timedelta
+import datetime
 from typing import Dict
 from urllib import parse
 
@@ -60,8 +61,18 @@ def calendars(request):
         context={'is_mobile': is_mobile}
     )
 
+def search_day(request, year=None, month=None, day=None):
+    return search(request, year, month, day, 'day')
 
-def search(request):
+
+def search_week(request, year=None, month=None, day=None):
+    return search(request, year, month, day, 'week')
+
+
+def search_month(request, year=None, month=None, day=None):
+    return search(request, year, month, day, 'month')
+
+def search(request, year=None, month=None, day=None, timespan=None):
     def sort_events(events):
         """
         Sorts events in the event list by distance
@@ -78,9 +89,22 @@ def search(request):
     distance_form = DistanceFilterForm(request.GET)
 
     # Perform the get request to google api for the appropriate service and location
-    now = datetime.combine(datetime.today(), time(0, 0)).isoformat() + '-08:00'
-    tomorrow = (datetime.combine(datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
-    api_params = {'timeMin': now, 'timeMax': tomorrow, 'singleEvents': True, 'orderBy': "startTime"}
+    if timespan == 'day':
+        time_min = datetime.datetime.combine(datetime.date(year, month, day), time(0, 0)).isoformat() + '-08:00'
+        time_max = datetime.datetime.combine(datetime.date(year, month, day + 1), time(0, 0)).isoformat() + '-08:00'
+        api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
+
+    elif timespan == 'week':
+        time_min = datetime.datetime.combine(datetime.date(year, month, day), time(0, 0)).isoformat() + '-08:00'
+        time_max = datetime.datetime.combine(datetime.date(year, month, day + 7), time(0, 0)).isoformat() + '-08:00'
+        api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
+
+    else:
+        # If no parameters, set to display today's events
+        timespan = 'day'
+        time_min = datetime.datetime.combine(datetime.datetime.today(), time(0, 0)).isoformat() + '-08:00'
+        time_max = (datetime.datetime.combine(datetime.datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
+        api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
 
     services = request.GET.get('services')
     locations = request.GET.get('locations')
