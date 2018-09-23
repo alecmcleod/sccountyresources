@@ -136,7 +136,12 @@ def search(request, year=None, month=None, day=None, timespan=None):
             time_max = datetime.datetime.combine(datetime.date(year, month, day + i + 1), time(0, 0)).isoformat() + '-08:00'
             api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
             #Add that days worth of events to the list, and the name of the day
-            day_names.append(datetime.datetime.strftime(datetime.datetime(year, month, day + i, 0, 0), "%A, %B %d"))
+            if datetime.date(year, month, day + i) == datetime.datetime.today().date():
+                day_names.append(f"Today, {datetime.datetime.strftime(datetime.datetime(year, month, day + i, 0, 0), '%B %d')}")
+            elif datetime.date(year, month, day + i) == (datetime.date.today() + datetime.timedelta(days=1)):
+                day_names.append(f"Tomorrow, {datetime.datetime.strftime(datetime.datetime(year, month, day + i, 0, 0), '%B %d')}")
+            else:
+                day_names.append(datetime.datetime.strftime(datetime.datetime(year, month, day + i, 0, 0), "%A, %B %d"))
             daily_events.append(api_call(services, locations, api_params))
         
     else:
