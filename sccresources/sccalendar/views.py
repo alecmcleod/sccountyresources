@@ -9,6 +9,7 @@ from googleapiclient.errors import HttpError as GoogleHttpError
 from phonenumbers import NumberParseException
 from user_agents import parse as ua_parse
 
+from .google_auth import get_google_api_key
 from . import google_auth, models
 from .forms import ConfirmForm, SearchForm, SubscribeForm, DistanceFilterForm
 from .google_calendar import GoogleCalendar
@@ -38,7 +39,7 @@ cal_id_map = {
     "HEALTH": HEALTH_CAL_ID,
     "SHOWER": SHOWER_CAL_ID}
 # Google maps variable
-gmaps = GoogleMaps('AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
+gmaps = GoogleMaps()
 
 
 # Create your views here.
@@ -385,6 +386,7 @@ def details(request, service=None, event_id=None):
             'origin': origin,
             'form': form,
             'hidden_data': hidden_data,
+            'api_key': get_google_api_key()
         })
 
 

@@ -1,3 +1,4 @@
+from .google_auth import get_google_api_key
 from .google_calendar import GoogleEvent
 import googlemaps
 import json
@@ -45,7 +46,7 @@ class GoogleMaps:
     service: Calendar connection object used to request maps data
     """
 
-    def __init__(self, key: str) -> None:
+    def __init__(self, key: str=get_google_api_key()) -> None:
         """
         Creates new GoogleMaps object
         :param key: The google maps API key that provides access to the full suite of APIs

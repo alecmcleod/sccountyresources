@@ -1,13 +1,31 @@
 from __future__ import print_function
+
+import os
+
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-# maps api key AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g
 SCOPES = ['https://www.googleapis.com/auth/calendar']
-SERVICE_ACCOUNT_FILE = 'sccalendar/servicekey.json'
+
+
+def get_google_service_credentials():
+    """Return path to credentials or raise ValueError"""
+    try:
+        return os.environ['GOOGLE_SERVICE_KEY']
+    except KeyError:
+        raise ValueError('Set GOOGLE_SERVICE_KEY to allow Google API access')
+
+
+def get_google_api_key():
+    """Return api key or raise ValueError"""
+    try:
+        return os.environ['GOOGLE_MAPS_KEY']
+    except KeyError:
+        raise ValueError('Set GOOGLE_MAPS_KEY to allow Google API access')
+
 
 credentials = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    get_google_service_credentials(), scopes=SCOPES)
 
 service = build('calendar', 'v3', credentials=credentials)
 
