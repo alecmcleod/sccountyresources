@@ -32,8 +32,14 @@ DRUG_CAL = GoogleCalendar(google_auth.get_service(), DRUG_CAL_ID)
 HEALTH_CAL = GoogleCalendar(google_auth.get_service(), HEALTH_CAL_ID)
 SHOWER_CAL = GoogleCalendar(google_auth.get_service(), SHOWER_CAL_ID)
 # Maps keywords to Calendar variables
-var_map = {"DRUGS": DRUG_CAL, "FOOD": FOOD_CAL, "HEALTH": HEALTH_CAL, "SHOWER": SHOWER_CAL}
-cal_id_map = {"DRUGS": DRUG_CAL_ID, "FOOD": FOOD_CAL_ID, "HEALTH": HEALTH_CAL_ID, "SHOWER": SHOWER_CAL_ID}
+var_map = {"DRUGS": DRUG_CAL,
+           "FOOD": FOOD_CAL,
+           "HEALTH": HEALTH_CAL,
+           "SHOWER": SHOWER_CAL}
+cal_id_map = {"DRUGS": DRUG_CAL_ID,
+              "FOOD": FOOD_CAL_ID,
+              "HEALTH": HEALTH_CAL_ID,
+              "SHOWER": SHOWER_CAL_ID}
 # Google maps variable
 gmaps = GoogleMaps('AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
 
