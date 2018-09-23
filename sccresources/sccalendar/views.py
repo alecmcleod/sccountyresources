@@ -65,7 +65,12 @@ def search_day(request, year=None, month=None, day=None):
     return search(request, year, month, day, 'day')
 
 
-def search_week(request, year=None, month=None, day=None):
+def search_week(request):
+    now = datetime.datetime.now()
+    return search(request, now.year, now.month, now.day, 'week')
+
+
+def search_weekdate(request, year=None, month=None, day=None):
     return search(request, year, month, day, 'week')
 
 
