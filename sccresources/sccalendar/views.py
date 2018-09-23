@@ -86,7 +86,36 @@ def search(request, year=None, month=None, day=None, timespan=None):
 
         list.sort(events, key=event_key)
 
+    def api_call(services, locations, api_params):
+        """
+        Makes google maps api call for the specified service and location with the api_params given.
+        :param services: service to be returned
+        :param locations: location to distance from
+        :api_params: parameters for the api call
+        """
+        if services is None:
+            # If there are no search parameters, redirect to home page
+            print(request.get_full_path())
+            return HttpResponseRedirect('/')
+        elif services not in var_map:
+            # Requested service doesn't exist
+            raise Http404('Service does not exist.')
+        elif locations is None or len(locations) == 0:
+            # If no location is provided, don't apply distance to the event
+            events = list(var_map[services].get_events(api_params))
+        else:
+            # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
+            events = gmaps.convert_events(locations, list(var_map[services].get_events(api_params)))
+            if events is not None:
+                sort_events(events)
+        return events
+
     distance_form = DistanceFilterForm(request.GET)
+    services = request.GET.get('services')
+    locations = request.GET.get('locations')
+
+    daily_events = []
+    day_names = []
 
     # Perform the get request to google api for the appropriate service and location
     if timespan == 'day':
@@ -95,10 +124,16 @@ def search(request, year=None, month=None, day=None, timespan=None):
         api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
 
     elif timespan == 'week':
-        time_min = datetime.datetime.combine(datetime.date(year, month, day), time(0, 0)).isoformat() + '-08:00'
-        time_max = datetime.datetime.combine(datetime.date(year, month, day + 7), time(0, 0)).isoformat() + '-08:00'
-        api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
-
+        #Run the api call 7 times, one for each day, adding each to a dictionary of days
+        
+        for i in range(0,6):
+            time_min = datetime.datetime.combine(datetime.date(year, month, day + i), time(0, 0)).isoformat() + '-08:00'
+            time_max = datetime.datetime.combine(datetime.date(year, month, day + i + 1), time(0, 0)).isoformat() + '-08:00'
+            api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
+            #Add that days worth of events to the list, and the name of the day
+            day_names.append(datetime.datetime.strftime(datetime.datetime(year, month, day + i, 0, 0), "%A, %B %d"))
+            daily_events.append(api_call(services, locations, api_params))
+        
     else:
         # If no parameters, set to display today's events
         timespan = 'day'
@@ -106,32 +141,16 @@ def search(request, year=None, month=None, day=None, timespan=None):
         time_max = (datetime.datetime.combine(datetime.datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
         api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
 
-    services = request.GET.get('services')
-    locations = request.GET.get('locations')
-
-    if services is None:
-        # If there are no search parameters, redirect to home page
-        print(request.get_full_path())
-        return HttpResponseRedirect('/')
-    elif services not in var_map:
-        # Requested service doesn't exist
-        raise Http404('Service does not exist.')
-    elif locations is None or len(locations) == 0:
-        # If no location is provided, don't apply distance to the event
-        events_today = list(var_map[services].get_events(api_params))
-    else:
-        # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
-        events_today = gmaps.convert_events(locations, list(var_map[services].get_events(api_params)))
-        if events_today is not None:
-            sort_events(events_today)
+    events = api_call(services, locations, api_params)
 
     return render(
         request,
         'search.html',
-        context={'events': events_today,
+        context={'events': events,
                  'origin': request.GET.get('locations'),
                  'service': request.GET.get('services'),
-                 'distance_form': distance_form}
+                 'distance_form': distance_form,
+                 'daily_events': zip(daily_events, day_names)}
     )
 
 
