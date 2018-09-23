@@ -131,11 +131,12 @@ def search(request, year=None, month=None, day=None, timespan=None):
     elif timespan == 'week':
         #Run the api call 7 times, one for each day, adding each to a dictionary of days
         
-        for i in range(0,6):
+        for i in range(7):
             time_min = datetime.datetime.combine(datetime.date(year, month, day + i), time(0, 0)).isoformat() + '-08:00'
             time_max = datetime.datetime.combine(datetime.date(year, month, day + i + 1), time(0, 0)).isoformat() + '-08:00'
             api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
             #Add that days worth of events to the list, and the name of the day
+            #Say today if it is, and tomorrow if it is
             if datetime.date(year, month, day + i) == datetime.datetime.today().date():
                 day_names.append(f"Today, {datetime.datetime.strftime(datetime.datetime(year, month, day + i, 0, 0), '%B %d')}")
             elif datetime.date(year, month, day + i) == (datetime.date.today() + datetime.timedelta(days=1)):
