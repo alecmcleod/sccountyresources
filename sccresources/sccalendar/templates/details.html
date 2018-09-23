@@ -28,7 +28,7 @@
 
             {% block javascript %}
 
-
+          <!-- Unused text sign up
            <br>
             <form id='subscribeform' action="/calendar/confirm/" method="post" >
             {% csrf_token %}
@@ -41,12 +41,7 @@
             <br>
             <br>
 
-            <script type="text/javascript">
-  
-            
-            </script>
-
-            <input type="submit" value="Get Text Notifications" class="btn btn-primary"/>
+            <input type="submit" value="Get Text Notifications" class="btn btn-primary"/>-->
             </div >
 
              
@@ -78,8 +73,8 @@
         {% endif %}
             <br>
             <br>
-            <!-- export buttons -->
-            <a href="{% url 'download_event' service id %}" class="btn btn-primary">export to ical</a>
+            <!-- export buttons 
+            <a href="{% url 'download_event' service id %}" class="btn btn-primary">export to ical</a>--->
           </div>
       </div>
 {% endblock %}
