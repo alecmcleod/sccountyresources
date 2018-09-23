@@ -5,6 +5,14 @@
         <input type="hidden" name="services" value="{{service}}">
         <input type="hidden" name="locations" value="{{origin}}">
         {{distance_form}}
+        <input id="date" type="date" name="date-selection">
+        <script>
+            $("#date").change(function() {
+                date_data = $("#date").serializeArray()[0];
+                url = `/calendar/search/week/${date_data.value.replace(/-/g, "/")}`;
+                window.location.href = `${url}?${window.location.href.split("?")[1]}`;
+            })
+        </script>
     </form>
     {% if not daily_events %}
         {% for event in events %}
