@@ -1,9 +1,6 @@
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponseForbidden
 from functools import wraps
-from twilio import twiml
 from twilio.request_validator import RequestValidator
-
-import os
 
 
 def validate_twilio_request(f):

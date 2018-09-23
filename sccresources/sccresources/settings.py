@@ -26,7 +26,7 @@ SECRET_KEY = 's9uupcpes^x2=djgh!q*6w(e5^x^n4v))6@_=7#6r@kag&p5!p'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['scccalendar.serveo.net','localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['scccalendar.serveo.net', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -125,4 +125,3 @@ USE_TZ = True
 STATIC_URL = '/static/'
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-

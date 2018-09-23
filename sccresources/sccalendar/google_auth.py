@@ -7,12 +7,10 @@ SCOPES = ['https://www.googleapis.com/auth/calendar']
 SERVICE_ACCOUNT_FILE = 'sccalendar/servicekey.json'
 
 credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
 service = build('calendar', 'v3', credentials=credentials)
 
 
 def get_service():
     return service
-
-

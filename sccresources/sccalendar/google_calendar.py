@@ -1,12 +1,12 @@
 """
 Package for working with Google Calendar and iCal
 """
-from . import google_auth
 from datetime import datetime
 from typing import Generator
 from icalendar import Calendar, Event
 from googleapiclient.discovery import Resource
 from pyrfc3339 import parse
+
 
 class GoogleEvent():
     """
@@ -21,15 +21,16 @@ class GoogleEvent():
     end_datetime - A datetime object containing the end date and time of the event
     reccurence - A textual representation of the days the event reccurers on.
     """
-    def __init__(self, 
-                event,
-                default_summary = None, 
-                default_location = None, 
-                default_description = None,
-                default_reccurence = None):
+
+    def __init__(self,
+                 event,
+                 default_summary=None,
+                 default_location=None,
+                 default_description=None,
+                 default_reccurence=None) -> None:
         self._event = event
         self._defaults = {
-            "default_summary": default_summary, 
+            "default_summary": default_summary,
             "default_location": default_location,
             "default_description": default_description,
             "default_reccurence": default_reccurence
@@ -52,17 +53,22 @@ class GoogleEvent():
             # Then, it maps the array or strings to integers, after which it
             # uses the splat operater to pass it to the first three paramters
             # of datetime
-            self.start_datetime = datetime(*[int(x) for x in event["start"]["date"].split("-", 2)], 8, 0, 0)
-            self.end_datetime = datetime(*[int(x) for x in event["end"]["date"].split("-", 2)], 23, 59, 59)
+            self.start_datetime = datetime(*[int(x) for x in event["start"]["date"].split("-", 2)],  # type: ignore
+                                           8, 0, 0)
+            self.end_datetime = datetime(*[int(x) for x in event["end"]["date"].split("-", 2)],  # type: ignore
+                                         23, 59, 59)
             self._allday = True
-            
+
         try:
             self.reccurence = event["recurrence"]
         except KeyError:
             self.reccurence = default_reccurence
-    
+
     def __repr__(self):
-        return f"GoogleEvent(id: {self.id} summary:{self.summary} location:{self.location} description:{self.description} start_datetime:{self.start_datetime} end_datetime:{self.end_datetime} reccurence:{self.reccurence})"
+        return f"GoogleEvent(id: {self.id} summary:{self.summary} " \
+               f"location:{self.location} description:{self.description}" \
+               f" start_datetime:{self.start_datetime} end_datetime:{self.end_datetime}" \
+               f" reccurence:{self.reccurence})"
 
     @property
     def is_allday(self) -> bool:
@@ -76,19 +82,19 @@ class GoogleEvent():
         Returns this event as an iCalendar Event object
         """
         event = Event()
-        event.add("uid",            self._event["iCalUID"])
-        event.add("summary",        self.summary)
-        event.add("location",       self.location)
-        event.add("description",    self.description)
-        event.add("dtstart",        self.start_datetime)
-        event.add("dtend",          self.end_datetime)
+        event.add("uid", self._event["iCalUID"])
+        event.add("summary", self.summary)
+        event.add("location", self.location)
+        event.add("description", self.description)
+        event.add("dtstart", self.start_datetime)
+        event.add("dtend", self.end_datetime)
 
         if event.get("reccurence"):
             event.add("sequence", event["sequence"])
             for i in event.get("reccurence"):
                 prop_name, v = i.split(":", max_split=1)
                 event[prop_name] = v
-        
+
         return event
 
     def to_ical(self) -> Calendar:
@@ -98,6 +104,7 @@ class GoogleEvent():
         cal = Calendar()
         cal.add_component(self.to_ical_event())
         return cal
+
 
 class GoogleCalendar:
     """
@@ -111,7 +118,8 @@ class GoogleCalendar:
     time_zone - A string represeting the timezone of the calendar as returned by the Google Calendar API
     location - A string represeting the location of the calendar as returned by the Google Calendar API
     """
-    def __init__(self, service: Resource, calendar_id: str):
+
+    def __init__(self, service: Resource, calendar_id: str) -> None:
         """
         Creates a new GoogleCalendar object.
 
@@ -130,8 +138,9 @@ class GoogleCalendar:
 
     def __repr__(self):
         return "GoogleCalendar(" + self.service + ", " + self.calendar_id + ")"
-    
-    def get_event(self, event_id, api_params=dict(), google_event_params=dict()) -> GoogleEvent:
+
+    def get_event(self, event_id, api_params=dict(),
+                  google_event_params=dict()) -> GoogleEvent:
         """
         Returns an event by it's id.
 
@@ -157,9 +166,13 @@ class GoogleCalendar:
             if not resp.get("nextPageToken"):
                 return
             else:
-                resp = self.service.events().list(calendarId=self.calendar_id, pageToken=resp["nextPageToken"], **api_params).execute()
-    
-    def get_events(self, api_params=dict(), google_event_params=dict()) -> Generator[GoogleEvent, None, None]:
+                resp = self.service.events().list(
+                    calendarId=self.calendar_id,
+                    pageToken=resp["nextPageToken"],
+                    **api_params).execute()
+
+    def get_events(self, api_params=dict(), google_event_params=dict()
+                   ) -> Generator[GoogleEvent, None, None]:
         """
         Wrapper around get_raw_events that returns a GoogleEvent instance of a dict
         """
