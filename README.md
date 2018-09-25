@@ -1,4 +1,5 @@
 # Santa Cruz County Resources `README`
+
 #### Alec McLeod <aimcleod@ucsc.edu>,
 ##### Jesse Brennan <brennan@ucsc.edu>
 ---

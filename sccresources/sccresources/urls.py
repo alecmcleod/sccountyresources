@@ -25,6 +25,6 @@ urlpatterns = [
 urlpatterns += [
     path('calendar/', include('sccalendar.urls')),
     path('addressbook/', include('addressbook.urls')),
-    #Redirects index to ./calendar    
+    # Redirects index to ./calendar
     path('', RedirectView.as_view(url='/calendar/')),
 ]

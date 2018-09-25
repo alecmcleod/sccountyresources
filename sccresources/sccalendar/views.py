@@ -1,18 +1,15 @@
-import calendar
 import random
-from datetime import time, timedelta
-import datetime
-from typing import Dict
+from datetime import time, timedelta, datetime, date
 from urllib import parse
 
-import googlemaps
 import phonenumbers
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from googleapiclient.errors import HttpError as GoogleHttpError
 from phonenumbers import NumberParseException
 from user_agents import parse as ua_parse
 
+from .google_auth import get_google_api_key
 from . import google_auth, models
 from .forms import ConfirmForm, SearchForm, SubscribeForm, DistanceFilterForm
 from .google_calendar import GoogleCalendar
@@ -20,7 +17,6 @@ from .google_maps import GoogleMaps
 from .modules import sms
 from .modules.sms import (AlreadySubscribed, LessThanHour,
                           NullSubscriptionArgument)
-from .utils import parse_recurrence, to_sent, to_standard
 
 # Calendar ID variables
 FOOD_CAL_ID = 'hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com'
@@ -32,16 +28,18 @@ DRUG_CAL = GoogleCalendar(google_auth.get_service(), DRUG_CAL_ID)
 HEALTH_CAL = GoogleCalendar(google_auth.get_service(), HEALTH_CAL_ID)
 SHOWER_CAL = GoogleCalendar(google_auth.get_service(), SHOWER_CAL_ID)
 # Maps keywords to Calendar variables
-var_map = {"DRUGS": DRUG_CAL,
-           "FOOD": FOOD_CAL,
-           "HEALTH": HEALTH_CAL,
-           "SHOWER": SHOWER_CAL}
-cal_id_map = {"DRUGS": DRUG_CAL_ID,
-              "FOOD": FOOD_CAL_ID,
-              "HEALTH": HEALTH_CAL_ID,
-              "SHOWER": SHOWER_CAL_ID}
+var_map = {
+    "DRUGS": DRUG_CAL,
+    "FOOD": FOOD_CAL,
+    "HEALTH": HEALTH_CAL,
+    "SHOWER": SHOWER_CAL}
+cal_id_map = {
+    "DRUGS": DRUG_CAL_ID,
+    "FOOD": FOOD_CAL_ID,
+    "HEALTH": HEALTH_CAL_ID,
+    "SHOWER": SHOWER_CAL_ID}
 # Google maps variable
-gmaps = GoogleMaps('AIzaSyDY3_muYN8O6uGzGGRE35Xj_OPAMVrup4g')
+gmaps = GoogleMaps()
 
 
 # Create your views here.
@@ -58,7 +56,7 @@ def index(request):
 def calendars(request):
     try:
         is_mobile = ua_parse(str(request.META['HTTP_USER_AGENT'])).is_mobile
-    except:
+    except BaseException:
         is_mobile = False
 
     return render(
@@ -67,12 +65,13 @@ def calendars(request):
         context={'is_mobile': is_mobile}
     )
 
+
 def search_day(request, year=None, month=None, day=None):
     return search(request, year, month, day, 'day')
 
 
 def search_week(request):
-    now = datetime.datetime.now()
+    now = datetime.now()
     return search(request, now.year, now.month, now.day, 'week')
 
 
@@ -83,21 +82,23 @@ def search_weekdate(request, year=None, month=None, day=None):
 def search_month(request, year=None, month=None, day=None):
     return search(request, year, month, day, 'month')
 
-def search(request, year=None, month=None, day=None, timespan=None):
+
+def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C901
     def sort_events(events):
         """
         Sorts events in the event list by distance
         :param events: list to be sorted
         """
 
-        # the key defines what value is used to sort by in the event dictionaries. If it is missing it will return none
+        # the key defines what value is used to sort by in the event
+        # dictionaries. If it is missing it will return none
         def event_key(event):
             missing_distance = (event.distance is None)
             return missing_distance, event.distance if not missing_distance else None
 
         list.sort(events, key=event_key)
 
-    def api_call(services, locations, api_params):
+    def api_call(services, locations, api_params):  # noqa: C901
         """
         Makes google maps api call for the specified service and location with the api_params given.
         :param services: service to be returned
@@ -115,8 +116,10 @@ def search(request, year=None, month=None, day=None, timespan=None):
             # If no location is provided, don't apply distance to the event
             events = list(var_map[services].get_events(api_params))
         else:
-            # Use Calendar API to get a list of GoogleEvents, then use Distance Matrix to add distances to those events
-            events = gmaps.convert_events(locations, list(var_map[services].get_events(api_params)))
+            # Use Calendar API to get a list of GoogleEvents, then use Distance
+            # Matrix to add distances to those events
+            events = gmaps.convert_events(locations, list(
+                var_map[services].get_events(api_params)))
             if events is not None:
                 sort_events(events)
         return events
@@ -128,34 +131,36 @@ def search(request, year=None, month=None, day=None, timespan=None):
     daily_events = []
     day_names = []
 
-    # Perform the get request to google api for the appropriate service and location
+    # Perform the get request to google api for the appropriate service and
+    # location
     if timespan == 'day':
-        time_min = datetime.datetime.combine(datetime.date(year, month, day), time(0, 0)).isoformat() + '-08:00'
-        time_max = datetime.datetime.combine(datetime.date(year, month, day + 1), time(0, 0)).isoformat() + '-08:00'
+        time_min = datetime.combine(date(year, month, day), time(0, 0)).isoformat() + '-08:00'
+        time_max = datetime.combine(date(year, month, day + 1), time(0, 0)).isoformat() + '-08:00'
         api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
 
     elif timespan == 'week':
-        #Run the api call 7 times, one for each day, adding each to a dictionary of days
-        
+        # Run the api call 7 times, one for each day, adding each to a
+        # dictionary of days
+
         for i in range(7):
-            time_min = datetime.datetime.combine(datetime.date(year, month, day + i), time(0, 0)).isoformat() + '-08:00'
-            time_max = datetime.datetime.combine(datetime.date(year, month, day + i + 1), time(0, 0)).isoformat() + '-08:00'
+            time_min = datetime.combine(date(year, month, day + i), time(0, 0)).isoformat() + '-08:00'
+            time_max = datetime.combine(date(year, month, day + i + 1), time(0, 0)).isoformat() + '-08:00'
             api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
-            #Add that days worth of events to the list, and the name of the day
-            #Say today if it is, and tomorrow if it is
-            if datetime.date(year, month, day + i) == datetime.datetime.today().date():
-                day_names.append(f"Today, {datetime.datetime.strftime(datetime.datetime(year, month, day + i, 0, 0), '%B %d')}")
-            elif datetime.date(year, month, day + i) == (datetime.date.today() + datetime.timedelta(days=1)):
-                day_names.append(f"Tomorrow, {datetime.datetime.strftime(datetime.datetime(year, month, day + i, 0, 0), '%B %d')}")
+            # Add that days worth of events to the list, and the name of the day
+            # Say today if it is, and tomorrow if it is
+            if date(year, month, day + i) == datetime.today().date():
+                day_names.append(f"Today, {datetime.strftime(datetime(year, month, day + i, 0, 0), '%B %d')}")
+            elif date(year, month, day + i) == (date.today() + timedelta(days=1)):
+                day_names.append(f"Tomorrow, {datetime.strftime(datetime(year, month, day + i, 0, 0), '%B %d')}")
             else:
-                day_names.append(datetime.datetime.strftime(datetime.datetime(year, month, day + i, 0, 0), "%A, %B %d"))
+                day_names.append(datetime.strftime(datetime(year, month, day + i, 0, 0), "%A, %B %d"))
             daily_events.append(api_call(services, locations, api_params))
-        
+
     else:
         # If no parameters, set to display today's events
         timespan = 'day'
-        time_min = datetime.datetime.combine(datetime.datetime.today(), time(0, 0)).isoformat() + '-08:00'
-        time_max = (datetime.datetime.combine(datetime.datetime.today(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
+        time_min = datetime.combine(datetime.today().date(), time(0, 0)).isoformat() + '-08:00'
+        time_max = (datetime.combine(datetime.today().date(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
         api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
 
     events = api_call(services, locations, api_params)
@@ -184,9 +189,8 @@ def subscribe(request):
     try:
         test_case = phonenumbers.parse(number, None)
 
-
     except NumberParseException:
-        return render(request, 'confirm.html', \
+        return render(request, 'confirm.html',
                       context={'message': 'you entered an invalid number',
                                'action': ' ',
                                'title': 'back',
@@ -204,22 +208,26 @@ def subscribe(request):
                    }
 
     if not phonenumbers.is_valid_number(test_case):
-        return render(request, 'confirm.html', \
+        return render(request, 'confirm.html',
                       context={'message': 'you entered an invalid number',
                                'action': ' ',
                                'title': 'back',
                                'unseen_data': ''})
 
     try:
-        resp = sms.add_reminder(request.POST.get('event_id'), request.POST.get('cal_id'), \
-                                request.POST.get('date'), request.POST.get('time'), \
-                                request.POST.get('rrule'), request.POST.get('title'), \
-                                number)
+        resp = sms.add_reminder(
+            request.POST.get('event_id'),
+            request.POST.get('cal_id'),
+            request.POST.get('date'),
+            request.POST.get('time'),
+            request.POST.get('rrule'),
+            request.POST.get('title'),
+            number)
 
     except LessThanHour:
-        return render(request, 'confirm.html', \
+        return render(request, 'confirm.html',
                       context={'message':
-                                   'That event, it occurs in less than an hour. You are\
+                               'That event, it occurs in less than an hour. You are\
                                    signed up for future instances of this event.\
                                    You may enter your phone number again to unsubscibe.',
                                'title': 'back',
@@ -227,19 +235,28 @@ def subscribe(request):
                                'unseen_data': unseen_data})
 
     except AlreadySubscribed:
-        return render(request, 'confirm.html', \
-                      context={'message': 'You are already subscribed to this event,\
+        return render(
+            request,
+            'confirm.html',
+            context={
+                'message': 'You are already subscribed to this event,\
                     would you like us to unsubscibe you from this\
                     event?',
-                               'action': ' ', 'title': 'Keep Subsciption',
-                               'sec_action': '/calendar/cancel/', 'title2': 'Cancel Subscription',
-                               'unseen_data': unseen_data})
+                'action': ' ',
+                'title': 'Keep Subsciption',
+                'sec_action': '/calendar/cancel/',
+                'title2': 'Cancel Subscription',
+                'unseen_data': unseen_data})
 
     except NullSubscriptionArgument:
-        return render(request, 'confirm.html', \
-                      context={'message': 'there was an error processing your request',
-                               'action': ' ', 'title': 'back',
-                               'unseen_data': unseen_data})
+        return render(
+            request,
+            'confirm.html',
+            context={
+                'message': 'there was an error processing your request',
+                'action': ' ',
+                'title': 'back',
+                'unseen_data': unseen_data})
 
     the_secret_bean = random.randrange(1000, 9999)
 
@@ -252,7 +269,7 @@ future you can text this number CANCEL to unsubscribe from all notifications'))
 
     form = ConfirmForm(request.POST)
 
-    return render(request, 'confirm.html', \
+    return render(request, 'confirm.html',
                   context={
                       'form': form,
 
@@ -270,13 +287,13 @@ def confirm(request):
 
     if int(request.session['verification_code']) == int(entered_key):
 
-        sms.call_remind(request.POST.get('event_id'), \
-                        request.POST.get('cal_id'), \
-                        request.POST.get('iso_date_time'), \
+        sms.call_remind(request.POST.get('event_id'),
+                        request.POST.get('cal_id'),
+                        request.POST.get('iso_date_time'),
                         request.POST.get('number'))
 
         if request.POST.get('resp') == 'LTHE':
-            return render(request, 'confirm.html', \
+            return render(request, 'confirm.html',
                           context={'message': 'reminder confirmed. unfortunately\
                         the event occurs in less than an hour.\
                         you will notified at the next occurrance of this event',
@@ -284,18 +301,17 @@ def confirm(request):
                                    'title': 'back'})
 
         else:
-            return render(request, 'confirm.html', \
+            return render(request, 'confirm.html',
                           context={'message': 'reminder confirmed. you will receive\
                         notification one hour before the event.',
                                    'action': ' ',
                                    'title': 'back'})
     else:
 
-        return render(request, 'confirm.html', \
+        return render(request, 'confirm.html',
                       context={'message': 'you entered the wrong code,\
                     reenter your number if you wish to try again.',
-                               'action': ' '
-                          , 'title': 'back'})
+                               'action': ' ', 'title': 'back'})
 
 
 def unsubscribe(request):
@@ -317,9 +333,9 @@ def unsubscribe(request):
 def unsub_all(request):
     # args : phonenumber
     sms.unsubscribe()
-    return render(request,
-                  'confirm.html',
-                  context={'message': 'you have been unsubscribed from all events'})
+    return render(
+        request, 'confirm.html', context={
+            'message': 'you have been unsubscribed from all events'})
 
 
 def details(request, service=None, event_id=None):
@@ -347,22 +363,31 @@ def details(request, service=None, event_id=None):
 
     form = SubscribeForm(request.POST)
 
-    hidden_data = {'event_id': event_id, 'cal_id': cal_id_map[service],
-                   'title': event.summary, 'date': str(event.start_datetime.date()),
-                   'time': str(event.start_datetime.time()), 'rrule': event.reccurence}
+    hidden_data = {
+        'event_id': event_id,
+        'cal_id': cal_id_map[service],
+        'title': event.summary,
+        'date': str(event.start_datetime.date()),
+        'time': str(event.start_datetime.time()),
+        'rrule': event.reccurence}
 
-    return render(request, 'details.html', context={'title': event.summary,
-                                                    'location': event.location,
-                                                    'description': event.description,
-                                                    'date': event.start_datetime.date,
-                                                    'time': event.start_datetime.time,
-                                                    'recurrence': event.reccurence,
-                                                    'id': event_id,
-                                                    'service': service,
-                                                    'origin': origin,
-                                                    'form': form,
-                                                    'hidden_data': hidden_data,
-                                                    })
+    return render(
+        request,
+        'details.html',
+        context={
+            'title': event.summary,
+            'location': event.location,
+            'description': event.description,
+            'date': event.start_datetime.date,
+            'time': event.start_datetime.time,
+            'recurrence': event.reccurence,
+            'id': event_id,
+            'service': service,
+            'origin': origin,
+            'form': form,
+            'hidden_data': hidden_data,
+            'api_key': get_google_api_key()
+        })
 
 
 def event_ical_download(request, service=None, event_id=None):
@@ -376,7 +401,8 @@ def event_ical_download(request, service=None, event_id=None):
             'default_location': '1515 Ocean St, Santa Cruz, CA 95060',
             'default_description': ''
         }
-        event = var_map[service].get_event(event_id, dict(), google_event_params)
+        event = var_map[service].get_event(
+            event_id, dict(), google_event_params)
 
         response = HttpResponse(event.to_ical(), content_type='text/calendar')
         response['Content-Disposition'] = 'attachment; filename=calendar.ics'
@@ -396,6 +422,8 @@ def calendar_ical_download(request, service=None):
         # Requested service doesn't exist
         raise Http404("Service does not exist.")
     else:
-        response = HttpResponse(var_map[service].export_ical(), content_type='text/calendar')
+        response = HttpResponse(
+            var_map[service].export_ical(),
+            content_type='text/calendar')
         response['Content-Disposition'] = 'attachment; filename=calendar.ics'
         return response
