@@ -1,5 +1,7 @@
 import calendar
 
+import pytz
+
 
 def to_sent(abbrv_string):
     '''to_sent: input: a comma seperate string of day abbreviations
@@ -58,3 +60,11 @@ def to_standard(military_string):
             ':' + military_list[1] + " P.M."
     else:
         return str(int(military_list[0])) + ':' + military_list[1] + " A.M."
+
+
+pacific_tz =  pytz.timezone('US/Pacific')
+
+
+def get_tz():
+    """Return the pacific time timezone"""
+    return pacific_tz

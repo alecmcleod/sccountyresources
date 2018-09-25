@@ -9,6 +9,7 @@ from googleapiclient.errors import HttpError as GoogleHttpError
 from phonenumbers import NumberParseException
 from user_agents import parse as ua_parse
 
+from .utils import get_tz
 from .google_auth import get_google_api_key
 from . import google_auth, models
 from .forms import ConfirmForm, SearchForm, SubscribeForm, DistanceFilterForm
@@ -134,34 +135,44 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
     # Perform the get request to google api for the appropriate service and
     # location
     if timespan == 'day':
-        time_min = datetime.combine(date(year, month, day), time(0, 0)).isoformat() + '-08:00'
-        time_max = datetime.combine(date(year, month, day + 1), time(0, 0)).isoformat() + '-08:00'
-        api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
+        time_min = get_tz().localize(datetime(year, month, day))
+        time_max = time_min + timedelta(days=1)
+        api_params = {'timeMin': time_min.isoformat(),
+                      'timeMax': time_max.isoformat(),
+                      'singleEvents': True,
+                      'orderBy': "startTime"}
 
     elif timespan == 'week':
         # Run the api call 7 times, one for each day, adding each to a
         # dictionary of days
 
-        for i in range(7):
-            time_min = datetime.combine(date(year, month, day + i), time(0, 0)).isoformat() + '-08:00'
-            time_max = datetime.combine(date(year, month, day + i + 1), time(0, 0)).isoformat() + '-08:00'
-            api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
+        for days in range(7):
+            time_min = get_tz().localize(datetime(year, month, day)) + timedelta(days=days)
+            time_max = time_min + timedelta(days=1)
+            api_params = {'timeMin': time_min.isoformat(),
+                          'timeMax': time_max.isoformat(),
+                          'singleEvents': True,
+                          'orderBy': "startTime"}
             # Add that days worth of events to the list, and the name of the day
             # Say today if it is, and tomorrow if it is
-            if date(year, month, day + i) == datetime.today().date():
-                day_names.append(f"Today, {datetime.strftime(datetime(year, month, day + i, 0, 0), '%B %d')}")
-            elif date(year, month, day + i) == (date.today() + timedelta(days=1)):
-                day_names.append(f"Tomorrow, {datetime.strftime(datetime(year, month, day + i, 0, 0), '%B %d')}")
-            else:
-                day_names.append(datetime.strftime(datetime(year, month, day + i, 0, 0), "%A, %B %d"))
+            # FIXME: use timedeltas and make timezone aware
+            # if date(year, month, day + i) == datetime.today().date():
+            #     day_names.append(f"Today, {datetime.strftime(datetime(year, month, day + i, 0, 0), '%B %d')}")
+            # elif date(year, month, day + i) == (date.today() + timedelta(days=1)):
+            #     day_names.append(f"Tomorrow, {datetime.strftime(datetime(year, month, day + i, 0, 0), '%B %d')}")
+            # else:
+            #     day_names.append(datetime.strftime(datetime(year, month, day + i, 0, 0), "%A, %B %d"))
+            day_names.append(time_min.strftime("%A, %B %d"))
             daily_events.append(api_call(services, locations, api_params))
 
     else:
         # If no parameters, set to display today's events
-        timespan = 'day'
-        time_min = datetime.combine(datetime.today().date(), time(0, 0)).isoformat() + '-08:00'
-        time_max = (datetime.combine(datetime.today().date(), time(0, 0)) + timedelta(days=1)).isoformat() + '-08:00'
-        api_params = {'timeMin': time_min, 'timeMax': time_max, 'singleEvents': True, 'orderBy': "startTime"}
+        time_min = get_tz().localize(datetime.today())
+        time_max = time_min + timedelta(days=1)
+        api_params = {'timeMin': time_min.isoformat(),
+                      'timeMax': time_max.isoformat(),
+                      'singleEvents': True,
+                      'orderBy': "startTime"}
 
     events = api_call(services, locations, api_params)
 
