@@ -1,19 +1,36 @@
 {% extends "base_generic.html" %} {% block content %}
 
 <div class="list-group">
-    <form action="/calendar/search/" method="get">
-        <input type="hidden" name="services" value="{{service}}">
-        <input type="hidden" name="locations" value="{{origin}}">
-        {{distance_form}}
-        <input id="date" type="date" name="date-selection">
-        <script>
-            $("#date").change(function() {
-                date_data = $("#date").serializeArray()[0];
-                url = `/calendar/search/week/${date_data.value.replace(/-/g, "/")}`;
-                window.location.href = `${url}?${window.location.href.split("?")[1]}`;
-            })
-        </script>
-    </form>
+    {% if origin %}
+    <h1>Results for {{service}} near {{origin}}:</h1>
+    {% else %}
+    <h1>Results for {{service}}:</h1>
+    {% endif %}
+    <div class="row justify-content-center">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <form action="/calendar/search/" method="get">
+                        <input type="hidden" name="services" value="{{service}}">
+                        <input type="hidden" name="locations" value="{{origin}}">
+                        {{distance_form}}
+                        <br />
+                        <label for="date">Events happening on:</label>
+                        <input id="date" type="date" name="date-selection">
+                        <script>
+                            $("#date").change(function() {
+                                date_data = $("#date").serializeArray()[0];
+                                url = `/calendar/search/week/${date_data.value.replace(/-/g, "/")}`;
+                                window.location.href = `${url}?${window.location.href.split("?")[1]}`;
+                            })
+                        </script>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
     {% if not daily_events %}
         {% for event in events %}
         <a href="/calendar/details/{{service}}/{{event.id}}?locations={{origin}}" class="list-group-item">
@@ -25,15 +42,16 @@
         {% endfor %}
     {% else %}
         {% for events, name in daily_events %}
-            <h1>{{name}}</h1>
+            <h2>{{name}}</h2>
             {% for event in events %}
-                <a href="/calendar/details/{{service}}/{{event.id}}?locations={{origin}}" class="list-group-item">
-                    <h4 class="list-group-item-heading">{{event.summary}}</h4>
-                    <p class="list-group-item-text">{{event.description}}</p>
-                    <p class="list-group-item-text">{{event.distance_text}}</p>
+                <a href="/calendar/details/{{service}}/{{event.id}}?locations={{origin}}" class="list-group-item list-group-item-action flex-column">
+                        <h4 class="mb-1">{{event.summary}}</h4>
+                    
+                    <p class="mb-1">{{event.description}}</p>
+                    <small>{{event.distance_text}}</small>                
                 </a>
-                <p></p>
             {% endfor %}
+            <p></p>
         {% endfor %}
     {% endif %}
 </div>

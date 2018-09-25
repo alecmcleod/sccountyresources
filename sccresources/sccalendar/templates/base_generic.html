@@ -27,100 +27,25 @@
   <link rel="icon" href="{% static 'img/Santa_Cruz_County.ico' %}">
   <script src="{% static 'js/index.js' %}"></script>
   <style>
-      body
-      {
-          font-family:'Arvo', serif;
-      }
-      a#header {
-        font-size: 2rem;
-      }
-      .navbar-brand span {
-        padding-right: 10px;
-      }
-      /* controls hamberger menu size */
-      .navbar-toggler {
-        font-size: 0.7rem;
-      }
-      @media (max-width: 470px) {
-        a.navbar-brand {
-          font-size: 1rem;
-        }
-        a#header {
-          font-size: 1.1rem;
-        }
-      }
-      @media (max-width: 420px) {
-        a.navbar-brand {
-          font-size: 0.9rem;
-        }
-        a#header {
-          font-size: 1.1rem;
-        }
-      }
-      @media (max-width: 370px) {
-        a.navbar-brand {
-          font-size: 0.8rem;
-        }
-        a#header {
-          font-size: 1rem;
-        }
-      }
-      @media (max-width: 345px) {
-        a.navbar-brand {
-          font-size: 0.7rem;
-        }
-        a#header {
-          font-size: 0.9rem;
-        }
-      }
-
   </style>
 </head>
 
 <body>
-
+  <div id="wrap">
     <!--
         Begin the main container
     -->
-  <div class="container">
+  <div id="main" class="container-fullwidth">
     <!--
         Navbar at the top of the page
     -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    
+    <nav class="navbar navbar-light bg-light">
       <a class="navbar-brand" href="/">
-        <span>Santa Cruz County Resources</span>
-        <!--
-          Loading static image from `static`
-        -->
         {% load static %}
-        <img src="{% static 'img/Santa_Cruz_County.png' %}" width="8%" height="8%"></img>
+        <img src="{% static 'img/Santa_Cruz_County.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+        Santa Cruz County Resources
       </a>
-      <!-- <a class="navbar-brand" href="/">
-
-      </a> -->
-
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-      </button>
-        <!--
-          Navbar items linking to different elements in the page
-        -->
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <!--
-              Navbar item that will go to the "About" section when clicked
-            -->
-          <li class="nav-item active">
-            <a class="nav-link" href="/calendar/#about">About</a>
-          </li>
-          <!--
-            Navbar item that will go to the "Calendar" section when clicked
-          -->
-          <li class="nav-item active">
-            <a class="nav-link" href="/calendar/calendars">Calendars</a>
-          </li>
-        </ul>
-      </div>
     </nav>
     <!--
       Containerizing the rest of the body inside of `index.html` (think of
@@ -129,7 +54,7 @@
     -->
     <div class="container mb-5" id="header">
         <div id="header">
-          <div class="col-md text-center mb-2 mt-5">
+          <div class="col-md text-center mb-1 mt-5">
             {% block content %} {% endblock %}
           </div>
         </div>
@@ -137,7 +62,8 @@
     <!--
         Footer at the bottom of the page
     -->
-   <div class="card-footer sm-transparent border-success text-center">© 2018 Santa Cruz County Resources</div>
+  </div>
+   <div class="footer border-success text-center">© 2018 Santa Cruz County Resources</div>
 </body>
 
 </html>

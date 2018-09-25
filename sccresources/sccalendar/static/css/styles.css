@@ -7,6 +7,22 @@
 @import url('https://fonts.googleapis.com/css?family=Pacifico');
 @import url('https://fonts.googleapis.com/css?family=Arvo');
 
+html
+{
+    position: relative;
+    height: 100%;
+}
+
+body
+{
+    margin-bottom: 60px;
+}
+
+#wrap
+{
+    padding: 10px;
+}
+
 .modal
 {
     overflow-y: scroll;
