@@ -1,9 +1,10 @@
-# Santa Cruz County Resources `README`
+# Santa Cruz County Resources
 
-#### Alec McLeod <aimcleod@ucsc.edu>,
-##### Jesse Brennan <brennan@ucsc.edu>
----
+[![Build Status](https://travis-ci.org/thefreeguide/sccountyresources.svg?branch=master)](https://travis-ci.org/thefreeguide/sccountyresources)
 
+### Maintainers
+- Alec McLeod <aimcleod@ucsc.edu>
+- Jesse Brennan <brennan@ucsc.edu>
 
 <!-- <img src="https://www.ticketsnipers.com/assets/images/article/Santa_Cruz.png" height=500x /> -->
 
@@ -27,4 +28,3 @@ you with the soonest open soup kitchen or food bank near your location.
 * Outlook for the next version
 * Running list of `TODO` items and coding style guide (*for developers*)
 * team work agreement
-
