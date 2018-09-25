@@ -1,6 +1,6 @@
 # Santa Cruz County Resources `README`
-#### Contributors: Zhanhua Hu <hzhanhua@ucsc.edu>, Alec McLeod <aimcleod@ucsc.edu>,
-##### Paul May<pwmay@ucsc.edu>, Isaac Avram<iavram@ucsc.edu>
+#### Alec McLeod <aimcleod@ucsc.edu>,
+##### Jesse Brennan <brennan@ucsc.edu>
 ---
 
 
