@@ -1,0 +1,14 @@
+language: python
+python: "3.6"
+
+before_install:
+- openssl aes-256-cbc -K $encrypted_31e08ec2a393_key -iv $encrypted_31e08ec2a393_iv
+  -in servicekey.json.enc -out servicekey.json -d
+install:
+  - pip install -r sccresources/requirements-dev.txt
+# command to run tests
+script:
+  - cd sccresources/
+  - python manage.py test
+
+# TODO: add encrypted servicekey json with travis, add to gitignore too
