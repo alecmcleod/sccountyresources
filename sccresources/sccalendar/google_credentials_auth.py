@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import os
 
 from google.oauth2 import service_account

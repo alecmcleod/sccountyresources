@@ -5,7 +5,7 @@ import unittest
 from .google_calendar import GoogleCalendar, GoogleEvent
 from .utils import to_sent
 
-from .google_auth import get_service
+from .google_credentials_auth import get_service
 from django.test import TestCase
 
 

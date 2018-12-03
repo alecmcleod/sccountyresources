@@ -1,7 +1,7 @@
 from background_task import background
 from pyrfc3339 import parse
 from .. import models
-from .. import google_auth
+from .. import google_credentials_auth
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from twilio.rest import Client
@@ -212,8 +212,8 @@ def __remind(event_id, cal_id, iso_date_time, title):
 
         google_now = now.isoformat('T') + 'Z'
         # get next instance
-        events = google_auth.service.events().instances(eventId=event_id, calendarId=cal_id,
-                                                        maxResults=5, timeMin=google_now).execute()
+        events = google_credentials_auth.service.events().instances(eventId=event_id, calendarId=cal_id,
+                                                                    maxResults=5, timeMin=google_now).execute()
 
         if len(events['items']) > 1:
 
