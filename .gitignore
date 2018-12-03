@@ -6,4 +6,6 @@ venv
 .pickle
 __pycache__
 servicekey.json
+app.yaml
+app.yml
 
