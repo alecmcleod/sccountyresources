@@ -108,7 +108,7 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
         """
         if services is None:
             # If there are no search parameters, redirect to home page
-            print(request.get_full_path())
+            # print(request.get_full_path())
             return HttpResponseRedirect('/')
         elif services not in var_map:
             # Requested service doesn't exist
@@ -271,7 +271,7 @@ def subscribe(request):
 
     the_secret_bean = random.randrange(1000, 9999)
 
-    print('the secret code is : ', the_secret_bean)
+    # print('the secret code is : ', the_secret_bean)
 
     request.session['verification_code'] = the_secret_bean
 

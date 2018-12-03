@@ -88,7 +88,6 @@ class GoogleMaps:
         # TODO: Might be a good idea to add a little bit more specific error
         # handling
         if not resp['status'] == "OK":
-            print('Recieved error from Google Distance Matrix API: ' + resp['status'])
             raise IOError('Recieved error from Goole Distance Matrix API: ' + resp['status'])
 
         elements = resp['rows'][0]['elements']

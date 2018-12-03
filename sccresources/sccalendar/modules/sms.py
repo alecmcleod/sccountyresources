@@ -45,7 +45,7 @@ error classes
 class LessThanHour(Exception):
     def __init__(self):
         self.error_text = 'LessThanHour Exception: event occurs in less than an hour.'
-        print(self.error_text)
+        # print(self.error_text)
 
     def __str__(self):
         return repr(self.error_text)
@@ -54,7 +54,7 @@ class LessThanHour(Exception):
 class AlreadySubscribed(Exception):
     def __init__(self):
         self.error_text = 'User is already subscribed.'
-        print(self.error_text)
+        # print(self.error_text)
 
     def __str__(self):
         return repr(self.error_text)
@@ -63,7 +63,7 @@ class AlreadySubscribed(Exception):
 class NullSubscriptionArgument(Exception):
     def __init__(self):
         self.error_text = 'One or more of the the argument in add_reminder is null.'
-        print(self.error_text)
+        # print(self.error_text)
 
     def __str__(self):
         return repr(self.error_text)
@@ -107,7 +107,7 @@ def add_reminder(event_id, cal_id, date, time, rrule, title, phone_number):   # 
         if seconds <= 3600:
             seconds = 1
 
-        print('scheduling new event in ', seconds, ' seconds')
+        # print('scheduling new event in ', seconds, ' seconds')
         __remind(event_id, cal_id, iso, title, schedule=seconds - 3600)
         event.save()
 
@@ -123,7 +123,7 @@ def add_reminder(event_id, cal_id, date, time, rrule, title, phone_number):   # 
         try:
             numbers = models.Number.objects.filter(event=event)
             number_set = [i.number for i in numbers]
-            print(number_set)
+            # print(number_set)
             if new_number.number not in number_set:
                 seconds = one_hour_before(py_dt)
                 if seconds <= 3600:
@@ -197,9 +197,9 @@ def __remind(event_id, cal_id, iso_date_time, title):
             event_id=event_id,
             calendar_id=cal_id,
             iso_date_time=iso_date_time)
-        print('reminding event:', event)
+        # print('reminding event:', event)
         numbers_list = models.Number.objects.filter(event=event)
-        print('numbers found:', numbers_list)
+        # print('numbers found:', numbers_list)
 
         description = 'This is a reminder that ' + title +\
             ' occurs within the next hour, from Santa Cruz County Resource Center.\n \n \
@@ -222,7 +222,7 @@ def __remind(event_id, cal_id, iso_date_time, title):
                 time = next_event["start"]["dateTime"]
                 time = parse(time)
                 time = time.replace(tzinfo=None)
-                print(time)
+                # print(time)
             except KeyError:
                 # its all day
                 date = datetime.strptime(
@@ -232,7 +232,7 @@ def __remind(event_id, cal_id, iso_date_time, title):
 
             seconds = one_hour_before(time)
 
-            print('scheduling new event in ', seconds, ' seconds')
+            # print('scheduling new event in ', seconds, ' seconds')
 
             __remind(event_id, cal_id, iso_date_time, title, schedule=seconds)
 
@@ -240,4 +240,5 @@ def __remind(event_id, cal_id, iso_date_time, title):
             event.delete()
 
     except ObjectDoesNotExist:
-        print('no event or no number, no reminder sent')
+        # print('no event or no number, no reminder sent')
+        pass
