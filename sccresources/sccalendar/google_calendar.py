@@ -4,7 +4,6 @@ Package for working with Google Calendar and iCal
 from datetime import datetime
 from typing import Generator
 from icalendar import Calendar, Event
-from googleapiclient.discovery import Resource
 from pyrfc3339 import parse
 
 
@@ -111,7 +110,7 @@ class GoogleCalendar:
     Represents a connection to a Google Calendar.
 
     Properties:
-    service - The service object returned by google_auth.py associated with with this calendar.
+    service - The service object returned by google_credentials_auth.py associated with with this calendar.
     calendar_id - A string representing the Google Calendar ID
     summary - A string represeting the summary for the calendar as returned by the Google Calendar API
     description - A string representing the description for the calendar as returned by the Google Calendar API
@@ -119,12 +118,12 @@ class GoogleCalendar:
     location - A string represeting the location of the calendar as returned by the Google Calendar API
     """
 
-    def __init__(self, service: Resource, calendar_id: str) -> None:
+    def __init__(self, service, calendar_id: str) -> None:
         """
         Creates a new GoogleCalendar object.
 
         Params:
-        service - service object returned by google_auth.py
+        service - service object returned by google_credentials_auth.py
         calendar_id - A string representing the Google Calendar ID
         """
         self.service = service

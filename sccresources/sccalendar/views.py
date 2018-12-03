@@ -1,5 +1,5 @@
 import random
-from datetime import time, timedelta, datetime, date
+from datetime import timedelta, datetime
 from urllib import parse
 
 import phonenumbers
@@ -10,8 +10,8 @@ from phonenumbers import NumberParseException
 from user_agents import parse as ua_parse
 
 from .utils import get_tz
-from .google_auth import get_google_api_key
-from . import google_auth, models
+from .google_credentials_auth import get_google_api_key
+from . import google_credentials_auth, models
 from .forms import ConfirmForm, SearchForm, SubscribeForm, DistanceFilterForm
 from .google_calendar import GoogleCalendar
 from .google_maps import GoogleMaps
@@ -24,10 +24,10 @@ FOOD_CAL_ID = 'hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com'
 DRUG_CAL_ID = 'nu02uodssn6j0ij4o3l4rqv9dk@group.calendar.google.com'
 HEALTH_CAL_ID = 'vlqtpo7ig0mbvpmk91j8r736kk@group.calendar.google.com'
 SHOWER_CAL_ID = 'uk8elskt37v991sbe3k7qasu1k@group.calendar.google.com'
-FOOD_CAL = GoogleCalendar(google_auth.get_service(), FOOD_CAL_ID)
-DRUG_CAL = GoogleCalendar(google_auth.get_service(), DRUG_CAL_ID)
-HEALTH_CAL = GoogleCalendar(google_auth.get_service(), HEALTH_CAL_ID)
-SHOWER_CAL = GoogleCalendar(google_auth.get_service(), SHOWER_CAL_ID)
+FOOD_CAL = GoogleCalendar(google_credentials_auth.get_service(), FOOD_CAL_ID)
+DRUG_CAL = GoogleCalendar(google_credentials_auth.get_service(), DRUG_CAL_ID)
+HEALTH_CAL = GoogleCalendar(google_credentials_auth.get_service(), HEALTH_CAL_ID)
+SHOWER_CAL = GoogleCalendar(google_credentials_auth.get_service(), SHOWER_CAL_ID)
 # Maps keywords to Calendar variables
 var_map = {
     "DRUGS": DRUG_CAL,
@@ -108,7 +108,7 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
         """
         if services is None:
             # If there are no search parameters, redirect to home page
-            print(request.get_full_path())
+            # print(request.get_full_path())
             return HttpResponseRedirect('/')
         elif services not in var_map:
             # Requested service doesn't exist
@@ -271,7 +271,7 @@ def subscribe(request):
 
     the_secret_bean = random.randrange(1000, 9999)
 
-    print('the secret code is : ', the_secret_bean)
+    # print('the secret code is : ', the_secret_bean)
 
     request.session['verification_code'] = the_secret_bean
 

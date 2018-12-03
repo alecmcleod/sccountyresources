@@ -1,4 +1,4 @@
-from .google_auth import get_google_api_key
+from .google_credentials_auth import get_google_api_key
 from .google_calendar import GoogleEvent
 import googlemaps
 import json
@@ -46,7 +46,7 @@ class GoogleMaps:
     service: Calendar connection object used to request maps data
     """
 
-    def __init__(self, key: str=get_google_api_key()) -> None:
+    def __init__(self, key: str = get_google_api_key()) -> None:
         """
         Creates new GoogleMaps object
         :param key: The google maps API key that provides access to the full suite of APIs
@@ -88,7 +88,6 @@ class GoogleMaps:
         # TODO: Might be a good idea to add a little bit more specific error
         # handling
         if not resp['status'] == "OK":
-            print('Recieved error from Google Distance Matrix API: ' + resp['status'])
             raise IOError('Recieved error from Goole Distance Matrix API: ' + resp['status'])
 
         elements = resp['rows'][0]['elements']
