@@ -1,19 +1,17 @@
-Django==2.0.2
+Django==2.0.8
 django-background-tasks==1.1.13
 django-compat==1.0.15
 django-dotenv==1.4.2
 django-phonenumber-field==2.0.0
 google-api-python-client==1.6.6
-google-auth==1.4.1
+google-auth==1.6.1
 google-auth-httplib2==0.0.3
-# google-auth-oauthlib can probably be deleted
-google-auth-oauthlib==0.2.0
 googlemaps==2.5.1
 gunicorn==19.9.0
 icalendar==4.0.1
 phonenumbers==8.9.6
 pyRFC3339==1.0
 pytz==2018.3
-requests==2.18.4
+requests==2.20.0
 twilio==6.14.4
 user-agents==1.1.0
