@@ -1,4 +1,5 @@
 mypy
 flake8
 ipython
+ruamel.yaml
 -r requirements.txt

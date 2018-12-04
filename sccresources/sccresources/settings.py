@@ -24,7 +24,24 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 's9uupcpes^x2=djgh!q*6w(e5^x^n4v))6@_=7#6r@kag&p5!p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.environ.get('DEPLOYED', None))
+
+# TODO: remove this
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
+        },
+    },
+}
 
 # SECURITY WARNING: App Engine's security features ensure that it is safe to
 # have ALLOWED_HOSTS = ['*'] when the app is deployed. If you deploy a Django
@@ -127,4 +144,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_ROOT = 'static/'
-STATIC_URL = '/static/'
+
+if os.environ.get('DEPLOYED', None):
+    project = os.environ['PROJECT_NAME']
+    STATIC_URL = f'https://storage.googleapis.com/{project}/static/'
+else:
+    STATIC_URL = '/static/'
