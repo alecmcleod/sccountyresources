@@ -1,143 +1,76 @@
-<!--
-    Author: Zhanhua Hu
-    Created for SCCR, 2018
--->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <!-- Jinja title -->
+
   {% block title %}
-  <title>Santa Cruz County Resources</title>
+  <title>The Free Guide Santa Cruz</title>
   {% endblock %}
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta http-equiv="cache-control" content="no-cache" />
-  <meta name="description" content="Landing page for the Santa Cruz County Resources">
-  <meta name="author" content="Zhanhua Hu">
-  <!-- Loading the required JavaScript, and then the CSS Bootstrap -->
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <meta name="description" content="The Free Guide Santa Cruz">
+  <meta name="author" content="Alec McLeod - Adapted from Clean Blog - Start Bootstrap Theme available at https://startbootstrap.com/template-overviews/clean-blog/">
+
+  <!-- External Dependencies -->
   <script src="https://maps.googleapis.com/maps/api/js"></script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
-  <!-- Loading static dependencies, such as CSS, JS, and image files, from `static` -->
+  <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+
+  <!-- Internal dependencies -->
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'fontawesome-free/css/all.min.css' %}">
   <link rel="icon" href="{% static 'img/Santa_Cruz_County.ico' %}">
   <script src="{% static 'js/index.js' %}"></script>
-  <style>
-      body
-      {
-          font-family:'Arvo', serif;
-      }
-      a#header {
-        font-size: 2rem;
-      }
-      .navbar-brand span {
-        padding-right: 10px;
-      }
-      /* controls hamberger menu size */
-      .navbar-toggler {
-        font-size: 0.7rem;
-      }
-      @media (max-width: 470px) {
-        a.navbar-brand {
-          font-size: 1rem;
-        }
-        a#header {
-          font-size: 1.1rem;
-        }
-      }
-      @media (max-width: 420px) {
-        a.navbar-brand {
-          font-size: 0.9rem;
-        }
-        a#header {
-          font-size: 1.1rem;
-        }
-      }
-      @media (max-width: 370px) {
-        a.navbar-brand {
-          font-size: 0.8rem;
-        }
-        a#header {
-          font-size: 1rem;
-        }
-      }
-      @media (max-width: 345px) {
-        a.navbar-brand {
-          font-size: 0.7rem;
-        }
-        a#header {
-          font-size: 0.9rem;
-        }
-      }
-
-  </style>
+  
 </head>
 
 <body>
-
-    <!--
-        Begin the main container
-    -->
-  <div class="container">
-    <!--
-        Navbar at the top of the page
-    -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="/">
-        <span>Santa Cruz County Resources</span>
-        <!--
-          Loading static image from `static`
-        -->
-        {% load static %}
-        <img src="{% static 'img/Santa_Cruz_County.png' %}" width="8%" height="8%"></img>
-      </a>
-      <!-- <a class="navbar-brand" href="/">
-
-      </a> -->
-
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand" href="/calendar/">The Santa Cruz Free Guide</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        Menu
+        <i class="fas fa-bars"></i>
       </button>
-        <!--
-          Navbar items linking to different elements in the page
-        -->
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <!--
-              Navbar item that will go to the "About" section when clicked
-            -->
-          <li class="nav-item active">
-            <a class="nav-link" href="/calendar/#about">About</a>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Calendars</a>
           </li>
-          <!--
-            Navbar item that will go to the "Calendar" section when clicked
-          -->
-          <li class="nav-item active">
-            <a class="nav-link" href="/calendar/calendars">Calendars</a>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact Us</a>
           </li>
         </ul>
       </div>
-    </nav>
-    <!--
-      Containerizing the rest of the body inside of `index.html` (think of
-      it as if we were "porting" the contents of `index.html` into this
-      container)
-    -->
-    <div class="container mb-5" id="header">
-        <div id="header">
-          <div class="col-md text-center mb-2 mt-5">
-            {% block content %} {% endblock %}
+    </div>
+  </nav>
+  {% block content %} {% endblock %}
+  <!-- Footer -->
+  <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <p class="copyright text-muted">Copyright &copy; The Free Guide 2018 a 501(c)(3) Non-Profit</p>
           </div>
         </div>
-    </div>
-    <!--
-        Footer at the bottom of the page
-    -->
-   <div class="card-footer sm-transparent border-success text-center">© 2018 Santa Cruz County Resources</div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    {% load static %}
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/clean-blog.min.js' %}"></script>
+
 </body>
 
 </html>

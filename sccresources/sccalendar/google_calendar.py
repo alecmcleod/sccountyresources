@@ -44,6 +44,7 @@ class GoogleEvent():
             # Try to parse the datetime like a normal event
             self.start_datetime = parse(event["start"]["dateTime"])
             self.end_datetime = parse(event["end"]["dateTime"])
+            self.time_text = parse(event["start"]["dateTime"]).strftime("%a, %b %#d at %#I:%M%p")
         except KeyError:
             # If a datetime doesn't exist, then it's likely an all-day event
             # According to the google api, date is in the format "yyyy-mm-dd"
@@ -57,6 +58,8 @@ class GoogleEvent():
             self.end_datetime = datetime(*[int(x) for x in event["end"]["date"].split("-", 2)],  # type: ignore
                                          23, 59, 59)
             self._allday = True
+            self.time_text = datetime(*[int(x) for x in event["start"]["date"].split("-", 2)],  # type: ignore
+                                           8, 0, 0).strftime("%a, %b %#d at %#I:%M%p")
 
         try:
             self.reccurence = event["recurrence"]

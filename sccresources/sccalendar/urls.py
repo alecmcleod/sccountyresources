@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('details/<str:service>/<str:event_id>/', views.details, name='details'),
     path('search/', views.search, name='search'),
+    path('search/day/', views.search_day_noncomplete, name = 'search_day_noncomplete'),
     path('search/day/<int:year>/<int:month>/<int:day>/', views.search_day, name='search_day'),
     path('search/week/', views.search_week, name='search_week'),
     path('search/week/<int:year>/<int:month>/<int:day>/', views.search_weekdate, name='search_weekdate'),

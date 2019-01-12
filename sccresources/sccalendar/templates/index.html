@@ -1,37 +1,35 @@
-<!--
-    Author: Zhanhua Hu
-    Created for SCCR, 2018
--->
-<!--
-    Jinja that extends this class from the base_generic HTML file
--->
 {% extends "base_generic.html" %} {% block content %}
 
 <!--
     Header welcoming the client/user to the website
 -->
-<h1 class="mt-5 mb-5">Welcome to Santa Cruz County Resources</h1>
-<!--
-    On a GET request instantiated by the client, the Jinja will auto-fill based
-    on the code in `urls.py`.
--->
-<form action="/calendar/search/week" method="get">
-  {{form}}
-  <button type="submit" class="btn btn-outline-primary">Submit</button>
-</form>
-
-<!--
-    "About card" telling about the cause
--->
-<div id="about" class="container mt-5 mb-5">
-  <div class="card w-100">
-    <div class="card-body">
-      <h5 class="">About Santa Cruz County Resources</h5>
-      <p class="card-text">In a county with many resources for homeless or vulnerable populations, this website provides
-      a way to search for the right one you need, when you need it.</p>
+<!-- Page Header -->
+{% load static %}
+<header class="masthead" style="background-image: url('{% static 'img/banner1.JPG' %}">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 mx-auto">
+                <div class="site-heading">
+                    <h1>Santa Cruz Free Guide</h1>
+                    <form action="/calendar/search/day" method="get">
+                        {{form}}
+                        <button type="submit" class="btn btn-outline-primary">Submit</button>
+                    </form>
+                    <div id="about" class="mt-0 mb-0">
+                        <div class="card w-100 bg-transparent">
+                            <div class="card-body">
+                                <h5 class="">About Santa Cruz County Resources</h5>
+                                <p class="card-text">In a county with many resources for homeless or vulnerable populations, this website provides
+                                a way to search for the right one you need, when you need it.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+</header>
 
 <script>
 if (navigator.geolocation) {
