@@ -135,15 +135,6 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
     for event in day_events:
         addresses.append(event.location)
 
-    if not any([year, month, day]):
-        # If no parameters, set to display today's events
-        time_min = get_tz().localize(datetime.today())
-        time_max = time_min + timedelta(days=1)
-        api_params = {'timeMin': time_min.isoformat(),
-                      'timeMax': time_max.isoformat(),
-                      'singleEvents': True,
-                      'orderBy': "startTime"}
-
     #Create variables defining the next day and previous day
     time_next = time_min + timedelta(days=1)
     time_prev = time_min + timedelta(days=-1)
