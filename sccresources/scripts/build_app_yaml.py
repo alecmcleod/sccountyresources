@@ -1,3 +1,5 @@
+import random
+import string
 import sys
 from pathlib import Path
 from ruamel.yaml import YAML
@@ -27,6 +29,8 @@ def main(argv):
     env_vars['PROJECT_NAME'] = project
     env_vars['GOOGLE_MAPS_KEY'] = maps_key
     env_vars['DEPLOYED'] = True
+    env_vars['SECRET_KEY'] = ''.join([random.SystemRandom().choice(
+        f"{string.ascii_letters}{string.digits}{string.punctuation}") for i in range(50)])
 
     with open(OUT_FILE, 'w') as fh:
         yaml.dump(content, fh)

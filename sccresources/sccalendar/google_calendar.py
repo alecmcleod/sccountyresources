@@ -7,7 +7,7 @@ from icalendar import Calendar, Event
 from pyrfc3339 import parse
 
 
-class GoogleEvent():
+class GoogleEvent:
     """
     Represents an event on a google calendar
 
