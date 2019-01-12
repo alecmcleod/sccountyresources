@@ -132,8 +132,9 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
                     'singleEvents': True,
                     'orderBy': "startTime"}
     day_events = api_call(services, locations, api_params)
-    for event in day_events:
-        addresses.append(event.location)
+    if day_events:
+        for event in day_events:
+            addresses.append(event.location)
 
     #Create variables defining the next day and previous day
     time_next = time_min + timedelta(days=1)
