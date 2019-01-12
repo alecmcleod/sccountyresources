@@ -75,19 +75,6 @@ def search_day(request, year=None, month=None, day=None):
     return search(request, year, month, day, 'day')
 
 
-def search_week(request):
-    now = datetime.now()
-    return search(request, now.year, now.month, now.day, 'week')
-
-
-def search_weekdate(request, year=None, month=None, day=None):
-    return search(request, year, month, day, 'week')
-
-
-def search_month(request, year=None, month=None, day=None):
-    return search(request, year, month, day, 'month')
-
-
 def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C901
     def sort_events(events):
         """
