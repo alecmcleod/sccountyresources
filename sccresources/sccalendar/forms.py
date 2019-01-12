@@ -31,7 +31,7 @@ class SearchForm(forms.Form):
             attrs={
                 'id': 'services'}))
     locations = forms.ChoiceField(
-        label='near',
+        label='near ',
         choices=LOCATION_CHOICES,
         required=False,
         label_suffix="",

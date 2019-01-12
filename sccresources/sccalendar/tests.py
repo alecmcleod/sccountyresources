@@ -115,7 +115,7 @@ class ViewsTestCase(TestCase):
         returns 200, and the correct template for each one.
         """
         for service in self.services:
-            response = self.client.get("/calendar/search/",
+            response = self.client.get("/calendar/search/day/",
                                        data={"services": service, "locations": "1515 Ocean St, Santa Cruz, CA 95060"})
             self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(
@@ -127,7 +127,7 @@ class ViewsTestCase(TestCase):
         If an invalid service for the search page is given, then we should 404.
         """
         response = self.client.get(
-            "/calendar/search/",
+            "/calendar/search/day/",
             data={
                 "services": "this doesn't exist",
                 "locations": "1515 Ocean St, Santa Cruz, CA 95060"})
@@ -139,7 +139,7 @@ class ViewsTestCase(TestCase):
         If no location for the search page is given, search should still work
         """
         for service in self.services:
-            response = self.client.get("/calendar/search/", data={"services": service})
+            response = self.client.get("/calendar/search/day/", data={"services": service})
             self.assertEqual(response.status_code, 200)
 
     def test_search_given_empty_location_expecting_200(self):
@@ -148,12 +148,12 @@ class ViewsTestCase(TestCase):
         empty string.
         """
         for service in self.services:
-            response = self.client.get("/calendar/search/", data={"services": service, "locations": ""})
+            response = self.client.get("/calendar/search/day/", data={"services": service, "locations": ""})
             self.assertEqual(response.status_code, 200)
 
     def test_search_given_invalid_location_expecting_200(self):
         for service in self.services:
-            response = self.client.get("/calendar/search/", data={"services": service, "locations": "Invalid"})
+            response = self.client.get("/calendar/search/day/", data={"services": service, "locations": "Invalid"})
             self.assertEqual(response.status_code, 200)
 
     def test_details_expecting_200(self):

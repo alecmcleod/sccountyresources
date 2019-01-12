@@ -66,22 +66,13 @@ def calendars(request):
         context={'is_mobile': is_mobile}
     )
 
+def search_day_noncomplete(request):
+    now = datetime.now()
+    return search(request, now.year, now.month, now.day, 'day')
+
 
 def search_day(request, year=None, month=None, day=None):
     return search(request, year, month, day, 'day')
-
-
-def search_week(request):
-    now = datetime.now()
-    return search(request, now.year, now.month, now.day, 'week')
-
-
-def search_weekdate(request, year=None, month=None, day=None):
-    return search(request, year, month, day, 'week')
-
-
-def search_month(request, year=None, month=None, day=None):
-    return search(request, year, month, day, 'month')
 
 
 def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C901
@@ -125,65 +116,42 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
                 sort_events(events)
         return events
 
-    distance_form = DistanceFilterForm(request.GET)
     services = request.GET.get('services')
     locations = request.GET.get('locations')
 
-    daily_events = []
+    addresses = []
     day_names = []
 
     # Perform the get request to google api for the appropriate service and
     # location
-    if timespan == 'day':
-        time_min = get_tz().localize(datetime(year, month, day))
-        time_max = time_min + timedelta(days=1)
-        api_params = {'timeMin': time_min.isoformat(),
-                      'timeMax': time_max.isoformat(),
-                      'singleEvents': True,
-                      'orderBy': "startTime"}
+    time_min = get_tz().localize(datetime(year, month, day))
+    time_max = time_min + timedelta(days=1)
+    day_name = time_min.strftime("%A, %B %d")
+    api_params = {'timeMin': time_min.isoformat(),
+                    'timeMax': time_max.isoformat(),
+                    'singleEvents': True,
+                    'orderBy': "startTime"}
+    day_events = api_call(services, locations, api_params)
+    if day_events:
+        for event in day_events:
+            addresses.append(event.location)
 
-    elif timespan == 'week':
-        # Run the api call 7 times, one for each day, adding each to a
-        # dictionary of days
-
-        for days in range(7):
-            time_min = get_tz().localize(datetime(year, month, day)) + timedelta(days=days)
-            time_max = time_min + timedelta(days=1)
-            api_params = {'timeMin': time_min.isoformat(),
-                          'timeMax': time_max.isoformat(),
-                          'singleEvents': True,
-                          'orderBy': "startTime"}
-            # Add that days worth of events to the list, and the name of the day
-            # Say today if it is, and tomorrow if it is
-            # FIXME: use timedeltas and make timezone aware
-            # if date(year, month, day + i) == datetime.today().date():
-            #     day_names.append(f"Today, {datetime.strftime(datetime(year, month, day + i, 0, 0), '%B %d')}")
-            # elif date(year, month, day + i) == (date.today() + timedelta(days=1)):
-            #     day_names.append(f"Tomorrow, {datetime.strftime(datetime(year, month, day + i, 0, 0), '%B %d')}")
-            # else:
-            #     day_names.append(datetime.strftime(datetime(year, month, day + i, 0, 0), "%A, %B %d"))
-            day_names.append(time_min.strftime("%A, %B %d"))
-            daily_events.append(api_call(services, locations, api_params))
-
-    else:
-        # If no parameters, set to display today's events
-        time_min = get_tz().localize(datetime.today())
-        time_max = time_min + timedelta(days=1)
-        api_params = {'timeMin': time_min.isoformat(),
-                      'timeMax': time_max.isoformat(),
-                      'singleEvents': True,
-                      'orderBy': "startTime"}
-
-    events = api_call(services, locations, api_params)
+    #Create variables defining the next day and previous day
+    time_next = time_min + timedelta(days=1)
+    time_prev = time_min + timedelta(days=-1)
+    time_next_date = [time_next.year, time_next.month, time_next.day]
+    time_prev_date = [time_prev.year, time_prev.month, time_prev.day]
 
     return render(
         request,
         'search.html',
-        context={'events': events,
-                 'origin': request.GET.get('locations'),
+        context={'origin': request.GET.get('locations'),
                  'service': request.GET.get('services'),
-                 'distance_form': distance_form,
-                 'daily_events': zip(daily_events, day_names)}
+                 'day_events': day_events,
+                 'day_name': day_name,
+                 'addresses': addresses,
+                 'next_date': time_next_date,
+                 'prev_date': time_prev_date}
     )
 
 
@@ -395,8 +363,6 @@ def details(request, service=None, event_id=None):
             'id': event_id,
             'service': service,
             'origin': origin,
-            'form': form,
-            'hidden_data': hidden_data,
             'api_key': get_google_api_key()
         })
 

@@ -3,83 +3,39 @@
 <!--Based off of Start Bootstrap: Blog Post-->
     <!-- Page Content -->
     <div class="container">
-         <!-- Title -->
-          <h1 class="sm-4">{{title}}</h1>
-          <hr>
-          <hr>
-
-            <div class="container">
-
-          <!-- Post Content -->
-
-            <div class="row" style ="margin: auto;width: 80%; padding: 10px;">
-
-            <div class="col-sm-6">
-           <div>
-             <h2>{{date}} {{time}}</h2>
-             <h3>{{location}}</h3>
-           </div>
-           <div>
-
-           </div>
-           <br>
-           <p>{{description}}</p>
-           <br>
-
-            {% block javascript %}
-
-
-           <br>
-            <form id='subscribeform' action="/calendar/confirm/" method="post" >
-            {% csrf_token %}
-            
-            {% for key, value in hidden_data.items %}
-            <input type="hidden" name={{key}} value='{{value}}' >
-            {% endfor %}
-            
-            {{form}}
-            <br>
-            <br>
-
-            <script type="text/javascript">
-  
-            
-            </script>
-
-            <input type="submit" value="Get Text Notifications" class="btn btn-primary"/>
-            </div >
-
-             
-
-              {% endblock %}
-
-          <!-- google map -->
-          <br><br>
-          <div id = "map" class='col-sm-6' style="height:'100px'">
-          <br><br>
-          {% if origin %}
-          <iframe
-                  width="300"
-                  height="300"
-                  frameborder="0" style="border:0"
-                  src="https://www.google.com/maps/embed/v1/directions?key={{api_key}}
-						  &origin={{origin}}
-						  &destination={{location}}"
-                  allowfullscreen>
-          </iframe>
-        {% else %}
-          <iframe
-          width="300"
-          height="300"
-          frameborder="0" style="border:0"
-          src="https://www.google.com/maps/embed/v1/place?key={{api_key}}
-          &q={{location}}" allowfullscreen>
-          </iframe>
-        {% endif %}
-            <br>
-            <br>
-            <!-- export buttons -->
-            <a href="{% url 'download_event' service id %}" class="btn btn-primary">export to ical</a>
-          </div>
+      <div class="row justify-content-md-center mt-3">
+        <div class="col-md-10">
+          <h1>{{title}}</h1>
+        </div>
       </div>
+      <div class="row justify-content-md-center">
+        <div class="col-md-5">
+          <h2>{{date}} {{time}}</h2>
+          <h3>{{location}}</h3>
+          <p>{{description}}</p>
+        </div>
+        <div class="col-md-5" id="map" align="center">
+          {% if origin %}
+            <iframe
+            width="300"
+            height="300"
+            frameborder="0" style="border:0"
+            src="https://www.google.com/maps/embed/v1/directions?key={{api_key}}
+            &origin={{origin}}
+            &destination={{location}}"
+            allowfullscreen>
+            </iframe>
+          {% else %}
+            <iframe
+            width="300"
+            height="300"
+            frameborder="0" style="border:0"
+            src="https://www.google.com/maps/embed/v1/place?key={{api_key}}
+            &q={{location}}" allowfullscreen>
+            </iframe>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
 {% endblock %}

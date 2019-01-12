@@ -1,40 +1,146 @@
 {% extends "base_generic.html" %} {% block content %}
+<!-- Main Content -->
+<div class="container" style="padding-top:10px;">
+  <div class="row">
+    <div class="col-md-6 col-sm-12" id="leftcol">
+      <h1>{{day_name}}</h1>
+        {% for event in day_events %}
+        <div class="post-preview" id="list-{{ forloop.counter0 }}">
+            <a href="/calendar/details/{{service}}/{{event.id}}?locations={{origin}}">
+                <h2 class="post-title">
+                {{event.summary}}
+                </h2>
+                <h4 class="post-subtitle">
+                {{event.description}}
+                </h4>
+            </a>
+            <p class="post-meta">{{event.time_text}} at {{event.location}}</p>
+            </div>
+            <hr>
+        {% endfor %}
+          <!-- Pager -->
+          <div class="clearfix">
+            <a class="btn btn-primary float-right" href="/calendar/search/day/{{next_date.0}}/{{next_date.1}}/{{next_date.2}}/?services={{service}}&locations={{origin}}">Next Day &rarr;</a>
+            <a class="btn btn-primary float-left" href="/calendar/search/day/{{prev_date.0}}/{{prev_date.1}}/{{prev_date.2}}/?services={{service}}&locations={{origin}}">&larr; Previous Day</a>
+          </div>
+        </div>
+        <div class="col-md-6 d-none d-md-block" id="rightcol" style="position: sticky;">
+          <div id="map" style="height:100%; width: 100%; padding:0;"></div>
 
-<div class="list-group">
-    <form action="/calendar/search/" method="get">
-        <input type="hidden" name="services" value="{{service}}">
-        <input type="hidden" name="locations" value="{{origin}}">
-        {{distance_form}}
-        <input id="date" type="date" name="date-selection">
-        <script>
-            $("#date").change(function() {
-                date_data = $("#date").serializeArray()[0];
-                url = `/calendar/search/week/${date_data.value.replace(/-/g, "/")}`;
-                window.location.href = `${url}?${window.location.href.split("?")[1]}`;
-            })
-        </script>
-    </form>
-    {% if not daily_events %}
-        {% for event in events %}
-        <a href="/calendar/details/{{service}}/{{event.id}}?locations={{origin}}" class="list-group-item">
-            <h4 class="list-group-item-heading">{{event.summary}}</h4>
-            <p class="list-group-item-text">{{event.description}}</p>
-            <p class="list-group-item-text">{{event.distance_text}}</p>
-        </a>
-        <p></p>
-        {% endfor %}
-    {% else %}
-        {% for events, name in daily_events %}
-            <h1>{{name}}</h1>
-            {% for event in events %}
-                <a href="/calendar/details/{{service}}/{{event.id}}?locations={{origin}}" class="list-group-item">
-                    <h4 class="list-group-item-heading">{{event.summary}}</h4>
-                    <p class="list-group-item-text">{{event.description}}</p>
-                    <p class="list-group-item-text">{{event.distance_text}}</p>
-                </a>
-                <p></p>
-            {% endfor %}
-        {% endfor %}
-    {% endif %}
-</div>
+          <script>
+          var addresses = [];
+          {% for address in addresses %}
+            addresses.push("{{address}}");
+          {% endfor %}
+
+          var addresses_latlng = [];
+
+          // Geocode addresses to lat long
+          function geocode_addresses(addresses, callback){
+            var geocoder = new google.maps.Geocoder();
+            var i;
+            for(i = 0; i < addresses.length; i++){
+              geocoder.geocode( {'address': addresses[i]}, function(results, status){
+                if (status == google.maps.GeocoderStatus.OK) {
+                  addresses_latlng.push(results[0].geometry.location)
+                  if(addresses_latlng.length == addresses.length){
+                    if(typeof callback == 'function'){
+                      callback();
+                    }
+                  }
+                } else {
+                  alert('Geocode was not successful for the following reason: ' + status);
+                  if(typeof callback == 'function'){
+                    callback();
+                  }
+                }
+              });
+            }
+          }
+
+          // Initialize and add the map
+          function initMap() {
+            // The location of Santa Cruz County
+            var santa_cruz = {
+              lat: 36.976980,
+              lng: -121.935446
+            };
+            // The map, centered on Santa Cruz County
+            var map = new google.maps.Map(
+              document.getElementById('map'), {
+                zoom: 10,
+                center: santa_cruz
+              });
+
+              geocode_addresses(addresses, function(){
+                // Add latlngs to map as markers
+                for(i = 0; i < addresses_latlng.length; i++){
+                  //console.log(addresses_latlng[i]);
+                  var marker = new google.maps.Marker({
+                    map: map,
+                    position: addresses_latlng[i]
+                  });
+
+                  // Map animations on hover and click over markers
+                  marker.addListener('click', function(inner_marker, inner_i)
+                  {
+                    return function(){
+                      map.setZoom(14);
+                      map.panTo(inner_marker.position);
+                      jQuery.fn.scrollTo = function(elem, speed) {
+                          $(this).animate({
+                              scrollTop:  $(this).scrollTop() - $(this).offset().top + $(elem).offset().top
+                          }, speed == undefined ? 1000 : speed);
+                          return this;
+                      };
+                      $(document).ready(function() {
+                        $("#leftcol").scrollTo("#list-" + inner_i, 600);
+                      });
+
+                    }
+                  }(marker, i));
+
+                  marker.addListener('mouseover', function(inner_marker, inner_i)
+                  {
+                    return function(){
+                      // jQuery scrollTo function
+
+                    }
+                  }(marker, i));
+
+                  // Map animations on hover over list item
+                  document.getElementById("list-" + i).onmouseover = function(inner_marker)
+                  {
+                    return function(){
+                    map.setZoom(14);
+                    map.panTo(inner_marker.position);
+                    inner_marker.setAnimation(google.maps.Animation.BOUNCE);
+                  }} (marker);
+                  document.getElementById("list-" + i).onmouseleave = function(inner_marker)
+                  {
+                    return function(){
+                    inner_marker.setAnimation(null);
+                  }}(marker);
+                }
+              });
+            }
+
+
+
+            </script>
+
+            <!--Load the API from the specified URL
+            * The async attribute allows the browser to render the page while the API loads
+            * The key parameter will contain your own API key (which is not needed for this tutorial)
+            * The callback parameter executes the initMap() function
+          -->
+          <script async defer
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAowLhX_nqZQhUuPjJ0qSORBrlhUV7SB7E&callback=initMap">
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
 {% endblock %}
