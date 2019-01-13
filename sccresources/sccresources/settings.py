@@ -149,9 +149,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_ROOT = 'static/'
-
-if os.environ.get('DEPLOYED', None):
-    project = os.environ['PROJECT_NAME']
-    STATIC_URL = f'https://storage.googleapis.com/{project}/static/'
-else:
-    STATIC_URL = '/static/'
+STATIC_URL = '/static/'

@@ -16,21 +16,19 @@ def main(argv):
         raise ValueError('app.yaml already exists.')
 
     try:
-        project = argv[1]
-        maps_key = argv[2]
+        maps_key = argv[1]
     except IndexError:
-        raise ValueError('project and/or maps_key were not set when running `make deploy')
+        raise ValueError('maps_key was not set when running `make deploy')
 
     yaml = YAML()
     with open('template-app.yaml', 'r') as fh:
         content = yaml.load(fh)
 
     env_vars = content['env_variables']
-    env_vars['PROJECT_NAME'] = project
     env_vars['GOOGLE_MAPS_KEY'] = maps_key
     env_vars['DEPLOYED'] = True
     env_vars['SECRET_KEY'] = ''.join([random.SystemRandom().choice(
-        f"{string.ascii_letters}{string.digits}{string.punctuation}") for i in range(50)])
+        f"{string.ascii_letters}{string.digits}{string.punctuation}") for _ in range(50)])
 
     with open(OUT_FILE, 'w') as fh:
         yaml.dump(content, fh)
