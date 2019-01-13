@@ -1,6 +1,3 @@
-# Author: Kobe Hu
-# Created for SCCR, 2018
-
 # Simple shell script to clear the Django cache (static files) and run the server
 # Please note this should only be a temporary fix
 

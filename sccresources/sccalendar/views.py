@@ -12,7 +12,7 @@ from user_agents import parse as ua_parse
 from .utils import get_tz
 from .google_credentials_auth import get_google_api_key
 from . import google_credentials_auth, models
-from .forms import ConfirmForm, SearchForm, SubscribeForm, DistanceFilterForm
+from .forms import ConfirmForm, SearchForm
 from .google_calendar import GoogleCalendar
 from .google_maps import GoogleMaps
 from .modules import sms
@@ -120,7 +120,6 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
     locations = request.GET.get('locations')
 
     addresses = []
-    day_names = []
 
     # Perform the get request to google api for the appropriate service and
     # location
@@ -128,15 +127,15 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
     time_max = time_min + timedelta(days=1)
     day_name = time_min.strftime("%A, %B %d")
     api_params = {'timeMin': time_min.isoformat(),
-                    'timeMax': time_max.isoformat(),
-                    'singleEvents': True,
-                    'orderBy': "startTime"}
+                  'timeMax': time_max.isoformat(),
+                  'singleEvents': True,
+                  'orderBy': "startTime"}
     day_events = api_call(services, locations, api_params)
     if day_events:
         for event in day_events:
             addresses.append(event.location)
 
-    #Create variables defining the next day and previous day
+    # Create variables defining the next day and previous day
     time_next = time_min + timedelta(days=1)
     time_prev = time_min + timedelta(days=-1)
     time_next_date = [time_next.year, time_next.month, time_next.day]
@@ -339,16 +338,6 @@ def details(request, service=None, event_id=None):
                 raise Http404('Event not found.')
     else:
         raise Http404('Service does not exist.')
-
-    form = SubscribeForm(request.POST)
-
-    hidden_data = {
-        'event_id': event_id,
-        'cal_id': cal_id_map[service],
-        'title': event.summary,
-        'date': str(event.start_datetime.date()),
-        'time': str(event.start_datetime.time()),
-        'rrule': event.reccurence}
 
     return render(
         request,
