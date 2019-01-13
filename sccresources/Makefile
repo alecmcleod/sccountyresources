@@ -29,7 +29,8 @@ test: check_venv
 # this target builds the app.yaml and does initial configuration for a
 # deployment. Make sure
 
-app.yaml: check_venv check_project
+app.yaml: check_venv check_project check_maps_key
+	@printf "$(green)Creating app.yaml$(normal)\n"
 	python scripts/build_app_yaml.py $(project) $(maps_key)
 
 build-static: check_project
@@ -42,7 +43,6 @@ build-static: check_project
 	gsutil mb gs://$(project)
 	@printf "$(cyan)Making gs://$(project) public$(normal)\n"
 	gsutil defacl set public-read gs://$(project)
-	@printf "$(green)Creating app.yaml$(normal)\n"
 
 # the deploy target should only be run after init-deploy has been run
 
