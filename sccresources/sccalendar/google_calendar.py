@@ -59,7 +59,7 @@ class GoogleEvent:
                                          23, 59, 59)
             self._allday = True
             self.time_text = datetime(*[int(x) for x in event["start"]["date"].split("-", 2)],  # type: ignore
-                                           8, 0, 0).strftime("%a, %b %#d at %#I:%M%p")
+                                      8, 0, 0).strftime("%a, %b %#d at %#I:%M%p")
 
         try:
             self.reccurence = event["recurrence"]
