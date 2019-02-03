@@ -1,4 +1,7 @@
 import os
+import httplib2shim
+# workaround for connection errors see https://github.com/thefreeguide/sccountyresources/issues/26
+httplib2shim.patch()  # NOQA
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
