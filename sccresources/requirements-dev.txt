@@ -1,6 +1,6 @@
 mypy
 flake8
 ipython
-PyYAML==3.12
+PyYAML==4.2b1
 ruamel.yaml
 -r requirements.txt
