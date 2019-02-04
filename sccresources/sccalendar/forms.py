@@ -7,10 +7,19 @@ class SearchForm(forms.Form):
 
     # Elements inside SERVICES correspond to (option_value, option_text)
     SERVICES_CHOICES = (('', ''),
-                        ('DRUGS', 'Drug Support'),
+                        ('ADDICTION', 'Addiction Services'),
                         ('FOOD', 'Food'),
-                        ('HEALTH', 'Health Care'),
-                        ('SHOWER', 'Showers'))
+                        ('GENERAL', 'General Support'),
+                        ('HOUSING', 'Housing Navigation'),
+                        ('HYGIENE', 'Hygiene'),
+                        ('MEDICAL', 'Medical and Dental'),
+                        ('PSYCH', 'Mental Health'),
+                        ('RESTROOM', 'Restrooms'),
+                        ('SMARTPATH', 'Smart Path Assessments'),
+                        ('STORAGE', 'Storage'),
+                        ('VETERAN', 'Veteran Services'),
+                        ('VET', 'Veterinarian')
+                        )
     # TODO replace option_value for LOCATION_CHOICES with google api location
     # strings
     LOCATION_CHOICES = (

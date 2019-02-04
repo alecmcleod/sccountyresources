@@ -11,10 +11,16 @@
                 {{event.summary}}
                 </h2>
                 <h4 class="post-subtitle">
+                {% if event.description %}
                 {{event.description}}
+                {% endif %}
                 </h4>
             </a>
+            {% if event.location %}
             <p class="post-meta">{{event.time_text}} at {{event.location}}</p>
+            {% else %}
+            <p class="post-meta">{{event.time_text}}</p>
+            {% endif %}
             </div>
             <hr>
         {% endfor %}
@@ -28,35 +34,18 @@
           <div id="map" style="height:100%; width: 100%; padding:0;"></div>
 
           <script>
-          var addresses = [];
-          {% for address in addresses %}
-            addresses.push("{{address}}");
-          {% endfor %}
-
-          var addresses_latlng = [];
-
-          // Geocode addresses to lat long
-          function geocode_addresses(addresses, callback){
-            var geocoder = new google.maps.Geocoder();
-            var i;
-            for(i = 0; i < addresses.length; i++){
-              geocoder.geocode( {'address': addresses[i]}, function(results, status){
-                if (status == google.maps.GeocoderStatus.OK) {
-                  addresses_latlng.push(results[0].geometry.location)
-                  if(addresses_latlng.length == addresses.length){
-                    if(typeof callback == 'function'){
-                      callback();
-                    }
-                  }
-                } else {
-                  alert('Geocode was not successful for the following reason: ' + status);
-                  if(typeof callback == 'function'){
-                    callback();
-                  }
-                }
-              });
-            }
+          var lats = [];
+          var lngs = [];
+          {% for event in day_events %}
+          if("{{event.latlng}}".localeCompare("NO_ADDRESS") != 0){
+            lats.push("{{event.latlng.0}}");
+            lngs.push("{{event.latlng.1}}");
+          } else {
+            lats.push(0);
+            lngs.push(0);
           }
+            
+          {% endfor %}
 
           // Initialize and add the map
           function initMap() {
@@ -72,57 +61,65 @@
                 center: santa_cruz
               });
 
-              geocode_addresses(addresses, function(){
-                // Add latlngs to map as markers
-                for(i = 0; i < addresses_latlng.length; i++){
-                  //console.log(addresses_latlng[i]);
-                  var marker = new google.maps.Marker({
-                    map: map,
-                    position: addresses_latlng[i]
-                  });
+              function geocode_addresses(){
+                // Add latlngs to map as markers as long as lat and lng aren't 0 (that means that event doesn't have an address)
+                for(i = 0; i < lats.length; i++){
+                  if(lats[i] != 0 && lngs[i] != 0){
+                    var marker = new google.maps.Marker({
+                      map: map,
+                      position: {lat: parseFloat(lats[i]), lng: parseFloat(lngs[i])}
+                    });
+                    
+                    // Map animations on hover and click over markers
+                    marker.addListener('click', function(inner_marker, inner_i)
+                    {
+                      return function(){
+                        map.setZoom(14);
+                        map.panTo(inner_marker.position);
+                        jQuery.fn.scrollTo = function(elem, speed) {
+                            $(this).animate({
+                                scrollTop:  $(this).scrollTop() - $(this).offset().top + $(elem).offset().top
+                            }, speed == undefined ? 1000 : speed);
+                            return this;
+                        };
+                        $(document).ready(function() {
+                          $("#leftcol").scrollTo("#list-" + inner_i, 600);
+                        });
 
-                  // Map animations on hover and click over markers
-                  marker.addListener('click', function(inner_marker, inner_i)
-                  {
-                    return function(){
+                      }
+                    }(marker, i));
+
+                    marker.addListener('mouseover', function(inner_marker, inner_i)
+                    {
+                      return function(){
+                        // jQuery scrollTo function
+
+                      }
+                    }(marker, i));
+
+                    // Map animations on hover over list item
+                    document.getElementById("list-" + i).onmouseover = function(inner_marker)
+                    {
+                      return function(){
                       map.setZoom(14);
                       map.panTo(inner_marker.position);
-                      jQuery.fn.scrollTo = function(elem, speed) {
-                          $(this).animate({
-                              scrollTop:  $(this).scrollTop() - $(this).offset().top + $(elem).offset().top
-                          }, speed == undefined ? 1000 : speed);
-                          return this;
-                      };
-                      $(document).ready(function() {
-                        $("#leftcol").scrollTo("#list-" + inner_i, 600);
-                      });
-
+                      inner_marker.setAnimation(google.maps.Animation.BOUNCE);
+                    }} (marker);
+                    document.getElementById("list-" + i).onmouseleave = function(inner_marker)
+                    {
+                      return function(){
+                      inner_marker.setAnimation(null);
+                    }}(marker);
+                  } else {
+                    // Event doesn't have an address, reset the map to default
+                    document.getElementById("list-" + i).onmouseover = function(){
+                      map.setCenter(santa_cruz);
+                      map.setZoom(10);
                     }
-                  }(marker, i));
-
-                  marker.addListener('mouseover', function(inner_marker, inner_i)
-                  {
-                    return function(){
-                      // jQuery scrollTo function
-
-                    }
-                  }(marker, i));
-
-                  // Map animations on hover over list item
-                  document.getElementById("list-" + i).onmouseover = function(inner_marker)
-                  {
-                    return function(){
-                    map.setZoom(14);
-                    map.panTo(inner_marker.position);
-                    inner_marker.setAnimation(google.maps.Animation.BOUNCE);
-                  }} (marker);
-                  document.getElementById("list-" + i).onmouseleave = function(inner_marker)
-                  {
-                    return function(){
-                    inner_marker.setAnimation(null);
-                  }}(marker);
+                  }
                 }
-              });
+              }
+              geocode_addresses();
             }
 
 

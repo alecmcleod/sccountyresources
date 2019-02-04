@@ -3,11 +3,13 @@ from datetime import timedelta, datetime
 from urllib import parse
 
 import phonenumbers
+import json
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from googleapiclient.errors import HttpError as GoogleHttpError
 from phonenumbers import NumberParseException
 from user_agents import parse as ua_parse
+from urllib.request import urlopen
 
 from .utils import get_tz
 from .google_credentials_auth import get_google_api_key
@@ -20,25 +22,62 @@ from .modules.sms import (AlreadySubscribed, LessThanHour,
                           NullSubscriptionArgument)
 
 # Calendar ID variables
-FOOD_CAL_ID = 'hv4cl31tra0t7l0ggbfrev6tes@group.calendar.google.com'
-DRUG_CAL_ID = 'nu02uodssn6j0ij4o3l4rqv9dk@group.calendar.google.com'
-HEALTH_CAL_ID = 'vlqtpo7ig0mbvpmk91j8r736kk@group.calendar.google.com'
-SHOWER_CAL_ID = 'uk8elskt37v991sbe3k7qasu1k@group.calendar.google.com'
+ADDICTION_CAL_ID = 'thefreeguide.org_5p1u40696ia4dk5gs9rv6vk2nc@group.calendar.google.com'
+FOOD_CAL_ID = 'thefreeguide.org_kvh6uvjr5q6b4ag81d8mn7gv6k@group.calendar.google.com'
+GENERAL_CAL_ID = 'thefreeguide.org_o47rok0bn546o1p7nuh7fv4hjc@group.calendar.google.com'
+HOUSING_CAL_ID = 'thefreeguide.org_8pt89nk8fjp3fc2hjioc08t9c8@group.calendar.google.com'
+HYGIENE_CAL_ID = 'thefreeguide.org_5claugljrihomenrh7g48vm47k@group.calendar.google.com'
+MEDICAL_CAL_ID = 'thefreeguide.org_i52aj8otebmkpp4bhg36ignu60@group.calendar.google.com'
+PSYCH_CAL_ID = 'thefreeguide.org_8i98m84jrnea246rcufbcm8fok@group.calendar.google.com'
+RESTROOM_CAL_ID = 'thefreeguide.org_lgt8qn6t8nsugv9vmfmq0i2474@group.calendar.google.com'
+SMARTPATH_CAL_ID = 'thefreeguide.org_dcd6op976eb8jv4710tarj0clk@group.calendar.google.com'
+STORAGE_CAL_ID = 'thefreeguide.org_mo1gcbgvc5ecu4g0j20hlgl38c@group.calendar.google.com'
+VETERAN_CAL_ID = 'thefreeguide.org_akjd0d7ebfblolmvu24efmaslc@group.calendar.google.com'
+VET_CAL_ID = 'thefreeguide.org_81c5ophc7o6efc7cg2us30h3qk@group.calendar.google.com'
+
+ADDICTION_CAL = GoogleCalendar(google_credentials_auth.get_service(), ADDICTION_CAL_ID)
 FOOD_CAL = GoogleCalendar(google_credentials_auth.get_service(), FOOD_CAL_ID)
-DRUG_CAL = GoogleCalendar(google_credentials_auth.get_service(), DRUG_CAL_ID)
-HEALTH_CAL = GoogleCalendar(google_credentials_auth.get_service(), HEALTH_CAL_ID)
-SHOWER_CAL = GoogleCalendar(google_credentials_auth.get_service(), SHOWER_CAL_ID)
+GENERAL_CAL = GoogleCalendar(google_credentials_auth.get_service(), GENERAL_CAL_ID)
+HOUSING_CAL = GoogleCalendar(google_credentials_auth.get_service(), HOUSING_CAL_ID)
+HYGIENE_CAL = GoogleCalendar(google_credentials_auth.get_service(), HYGIENE_CAL_ID)
+MEDICAL_CAL = GoogleCalendar(google_credentials_auth.get_service(), MEDICAL_CAL_ID)
+PSYCH_CAL = GoogleCalendar(google_credentials_auth.get_service(), PSYCH_CAL_ID)
+RESTROOM_CAL = GoogleCalendar(google_credentials_auth.get_service(), RESTROOM_CAL_ID)
+SMARTPATH_CAL = GoogleCalendar(google_credentials_auth.get_service(), SMARTPATH_CAL_ID)
+STORAGE_CAL = GoogleCalendar(google_credentials_auth.get_service(), STORAGE_CAL_ID)
+VETERAN_CAL = GoogleCalendar(google_credentials_auth.get_service(), VETERAN_CAL_ID)
+VET_CAL = GoogleCalendar(google_credentials_auth.get_service(), VET_CAL_ID)
+
 # Maps keywords to Calendar variables
 var_map = {
-    "DRUGS": DRUG_CAL,
+    "ADDICTION": ADDICTION_CAL,
     "FOOD": FOOD_CAL,
-    "HEALTH": HEALTH_CAL,
-    "SHOWER": SHOWER_CAL}
+    "GENERAL": GENERAL_CAL,
+    "HOUSING": HOUSING_CAL,
+    "HYGIENE": HYGIENE_CAL,
+    "MEDICAL": MEDICAL_CAL,
+    "PSYCH": PSYCH_CAL,
+    "RESTROOM": RESTROOM_CAL,
+    "SMARTPATH": SMARTPATH_CAL,
+    "STORAGE": STORAGE_CAL,
+    "VETERAN": VETERAN_CAL,
+    "VET": VET_CAL
+    }
 cal_id_map = {
-    "DRUGS": DRUG_CAL_ID,
+    "ADDICTION": ADDICTION_CAL_ID,
     "FOOD": FOOD_CAL_ID,
-    "HEALTH": HEALTH_CAL_ID,
-    "SHOWER": SHOWER_CAL_ID}
+    "GENERAL": GENERAL_CAL_ID,
+    "HOUSING": HOUSING_CAL_ID,
+    "HYGIENE": HYGIENE_CAL_ID,
+    "MEDICAL": MEDICAL_CAL_ID,
+    "PSYCH": PSYCH_CAL_ID,
+    "RESTROOM": RESTROOM_CAL_ID,
+    "SMARTPATH": SMARTPATH_CAL_ID,
+    "STORAGE": STORAGE_CAL_ID,
+    "VETERAN": VETERAN_CAL_ID,
+    "VET": VET_CAL_ID
+    }
+
 # Google maps variable
 gmaps = GoogleMaps()
 
@@ -131,9 +170,24 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
                   'singleEvents': True,
                   'orderBy': "startTime"}
     day_events = api_call(services, locations, api_params)
+    key = get_google_api_key()
     if day_events:
         for event in day_events:
-            addresses.append(event.location)
+            # Geocode event location and check to make sure it gets a correct result. If not, pass to array as if it did not have address
+            if event.location != None:
+                url="https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (event.location, key)
+                url = url.replace(" ", "+")
+                response = urlopen(url)
+                jsongeocode = response.read()
+                jsongeocode = json.loads(jsongeocode)
+                if(jsongeocode['status'] == "OK"):
+                    event.latlng = [jsongeocode['results'][0]['geometry']['location']['lat'], jsongeocode['results'][0]['geometry']['location']['lng']]
+                else:
+                    event.location = None
+                    event.latlng = "NO_ADDRESS"
+            else:
+                event.latlng = "NO_ADDRESS"
+
 
     # Create variables defining the next day and previous day
     time_next = time_min + timedelta(days=1)
