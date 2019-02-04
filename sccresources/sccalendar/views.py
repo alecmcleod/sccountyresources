@@ -1,4 +1,5 @@
 import random
+import logging
 from datetime import timedelta, datetime
 from urllib import parse
 
@@ -20,6 +21,8 @@ from .google_maps import GoogleMaps
 from .modules import sms
 from .modules.sms import (AlreadySubscribed, LessThanHour,
                           NullSubscriptionArgument)
+
+logger = logging.getLogger(__name__)
 
 # Calendar ID variables
 ADDICTION_CAL_ID = 'thefreeguide.org_5p1u40696ia4dk5gs9rv6vk2nc@group.calendar.google.com'
@@ -158,8 +161,6 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
     services = request.GET.get('services')
     locations = request.GET.get('locations')
 
-    addresses = []
-
     # Perform the get request to google api for the appropriate service and
     # location
     time_min = get_tz().localize(datetime(year, month, day))
@@ -183,6 +184,7 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
                 if(jsongeocode['status'] == "OK"):
                     event.latlng = [jsongeocode['results'][0]['geometry']['location']['lat'], jsongeocode['results'][0]['geometry']['location']['lng']]
                 else:
+                    logger.error("Was unable to geocode event %s, api status was %s", event.summary, jsongeocode['status'])
                     event.location = None
                     event.latlng = "NO_ADDRESS"
             else:
