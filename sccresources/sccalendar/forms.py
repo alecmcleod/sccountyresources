@@ -39,14 +39,14 @@ class SearchForm(forms.Form):
         widget=forms.Select(
             attrs={
                 'id': 'services'}))
-    locations = forms.ChoiceField(
-        label='near ',
-        choices=LOCATION_CHOICES,
-        required=False,
-        label_suffix="",
-        widget=forms.Select(
-            attrs={
-                'id': 'locations'}))
+    # locations = forms.ChoiceField(
+    #     label='near ',
+    #     choices=LOCATION_CHOICES,
+    #     required=False,
+    #     label_suffix="",
+    #     widget=forms.Select(
+    #         attrs={
+    #             'id': 'locations'}))
 
 
 class SubscribeForm(forms.Form):

@@ -200,7 +200,7 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
     return render(
         request,
         'search.html',
-        context={'origin': request.GET.get('locations'),
+        context={'origin': request.GET.get('locations', ''),
                  'service': request.GET.get('services'),
                  'day_events': day_events,
                  'day_name': day_name,
