@@ -202,7 +202,6 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
                  'service': request.GET.get('services'),
                  'day_events': day_events,
                  'day_name': day_name,
-                 'addresses': addresses,
                  'next_date': time_next_date,
                  'prev_date': time_prev_date}
     )
