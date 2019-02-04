@@ -162,7 +162,7 @@ class ViewsTestCase(TestCase):
         given the correct paramters, it returns a 200 and the correct template.
         """
         response = self.client.get(
-            "/calendar/details/FOOD/5tmc6k935cb5jmmqmnub4lhjjk_20180606T000000Z/")
+            "/calendar/details/FOOD/1ga6tvbtov1uqeikpol7qal2ni_20190203T183000Z/?locations=")
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response=response, template_name="details.html")
