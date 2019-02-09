@@ -12,10 +12,12 @@ from phonenumbers import NumberParseException
 from user_agents import parse as ua_parse
 from urllib.request import urlopen
 
+from django.core.mail import send_mail, BadHeaderError
+
 from .utils import get_tz
 from .google_credentials_auth import get_google_api_key
 from . import google_credentials_auth, models
-from .forms import ConfirmForm, SearchForm
+from .forms import ConfirmForm, SearchForm, ContactForm
 from .google_calendar import GoogleCalendar
 from .google_maps import GoogleMaps
 from .modules import sms
@@ -376,6 +378,22 @@ def details(request, service=None, event_id=None):
     Renders the detail page for a given event id
     """
 
+    #Email form handling
+    form_status = False
+    if request.method == 'GET':
+        form = ContactForm()
+    else:
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            from_email = form.cleaned_data['from_email']
+            message = form.cleaned_data['message']
+            try:               
+                send_mail(subject, message, from_email, ['admin@thefreeguide.org'], fail_silently=False)
+                form_status = True
+            except BadHeaderError:
+                return HttpResponse('Invalid header found.')
+
     origin = request.GET.get('locations')
 
     if service in var_map:
@@ -407,7 +425,9 @@ def details(request, service=None, event_id=None):
             'id': event_id,
             'service': service,
             'origin': origin,
-            'api_key': get_google_api_key()
+            'api_key': get_google_api_key(),
+            'contact_form': form,
+            'form_status': form_status
         })
 
 

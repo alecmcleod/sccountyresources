@@ -78,3 +78,8 @@ class DistanceFilterForm(forms.Form):
             attrs={
                 'id': 'within_distance',
                 'onchange': 'this.form.submit();'}))
+
+class ContactForm(forms.Form):
+    from_email = forms.EmailField(required=True)
+    subject = forms.CharField(required=True)
+    message = forms.CharField(widget=forms.Textarea, required=True)

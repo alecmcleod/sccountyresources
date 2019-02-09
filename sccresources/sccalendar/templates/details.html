@@ -1,6 +1,8 @@
-{% extends "base_generic.html" %} {% block content %}
-<!--Author: Paul May-->
+{% extends "base_generic.html" %} 
+{% block content %}
 <!--Based off of Start Bootstrap: Blog Post-->
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/contact.css' %}">
     <!-- Page Content -->
     <div class="container">
       <div class="row justify-content-md-center mt-3">
@@ -13,6 +15,33 @@
           <h2>{{date}} {{time}}</h2>
           <h3>{{location}}</h3>
           <p>{{description}}</p>
+          <div id="contact">Is this wrong?</div>
+          <div id="contactForm">
+              <h1>Is this wrong?</h1>
+              <small>Let us know! We'll look into it and fix it as soon as possible</small>
+            <form method="post">
+              {% csrf_token %}
+              {{ contact_form }}
+              <input class="formBtn" type="submit" />
+            </form>
+          </div>
+          <script>
+            $(function() {
+              // contact form animations
+              $('#contact').click(function() {
+                $('#contactForm').fadeToggle();
+              })
+              $(document).mouseup(function (e) {
+                var container = $("#contactForm");
+
+                if (!container.is(e.target) // if the target of the click isn't the container...
+                    && container.has(e.target).length === 0) // ... nor a descendant of the container
+                {
+                    container.fadeOut();
+                }
+              });              
+            });
+          </script>
         </div>
         <div class="col-md-5" id="map" align="center">
           {% if origin %}
