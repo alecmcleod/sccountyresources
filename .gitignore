@@ -8,4 +8,4 @@ __pycache__
 servicekey.json
 app.yaml
 app.yml
-
+/sccresources/static
