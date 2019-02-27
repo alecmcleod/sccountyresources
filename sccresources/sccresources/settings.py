@@ -58,6 +58,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'snowpenguin.django.recaptcha3',
     'phonenumber_field',
     'background_task',
     'django.contrib.admin',
@@ -135,6 +136,11 @@ EMAIL_HOST_USER = 'thefreeguide'
 EMAIL_HOST_PASSWORD = 'babaito2018'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+RECAPTCHA_PRIVATE_KEY = '6LdKXJAUAAAAAC1QpiTFajK2XKwgNCYs_wpuOeP8'
+RECAPTCHA_PUBLIC_KEY = '6LdKXJAUAAAAALunhGwrHZGYJYj8osb843xX6OOf'
+RECAPTCHA_DEFAULT_ACTION = 'generic'
+RECAPTCHA_SCORE_THRESHOLD = 0.5
 
 
 # Internationalization

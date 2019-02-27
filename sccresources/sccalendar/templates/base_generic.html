@@ -1,3 +1,4 @@
+{% load recaptcha3 %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,6 +27,9 @@
   <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
   <link rel="icon" href="{% static 'img/Santa_Cruz_County.ico' %}">
   <script src="{% static 'js/index.js' %}"></script>
+
+  {% recaptcha_init %}
+  {% recaptcha_ready action_name='homepage' %}
   
 </head>
 

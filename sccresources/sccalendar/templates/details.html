@@ -19,7 +19,7 @@
           <div id="contactForm">
               <h1>Is this wrong?</h1>
               <small>Let us know! We'll look into it and fix it as soon as possible</small>
-            <form method="post">
+            <form action="?" method="POST">
               {% csrf_token %}
               {{ contact_form }}
               <input class="formBtn" type="submit" />
