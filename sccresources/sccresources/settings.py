@@ -93,6 +93,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'sccalendar.context_processor.add_variables_to_context',
             ],
         },
     },
@@ -130,6 +131,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'thefreeguide'
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_PASSWORD', 'default')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/

@@ -1,10 +1,15 @@
+import os
 import random
 import logging
 from datetime import timedelta, datetime
 from urllib import parse
 
+from django.conf import settings
+from django.contrib import messages
+
 import phonenumbers
 import json
+import requests
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from googleapiclient.errors import HttpError as GoogleHttpError
@@ -12,10 +17,12 @@ from phonenumbers import NumberParseException
 from user_agents import parse as ua_parse
 from urllib.request import urlopen
 
+from django.core.mail import send_mail, BadHeaderError
+
 from .utils import get_tz
 from .google_credentials_auth import get_google_api_key
 from . import google_credentials_auth, models
-from .forms import ConfirmForm, SearchForm
+from .forms import ConfirmForm, SearchForm, ContactForm
 from .google_calendar import GoogleCalendar
 from .google_maps import GoogleMaps
 from .modules import sms
@@ -370,12 +377,54 @@ def unsub_all(request):
         request, 'confirm.html', context={
             'message': 'you have been unsubscribed from all events'})
 
+def get_google_captcha_private_credentials():
+    """Return path to credentials or raise ValueError"""
+    try:
+        return os.environ['GOOGLE_CAPTCHA_PRIVATE_KEY']
+    except KeyError:
+        raise ValueError('Set GOOGLE_CAPTCHA_PRIVATE_KEY to allow Google captcha to function')
 
 def details(request, service=None, event_id=None):
     """
     Renders the detail page for a given event id
     """
+    #Email form handling
+    if request.method == 'GET':
+        form = ContactForm()
+    else:
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            from_email = form.cleaned_data['from_email']
+            message = form.cleaned_data['message']
 
+            # Perform API request with captcha token to verify
+            captcha_response = form.data['g-recaptcha-response']
+            request_data = {'secret':get_google_captcha_private_credentials(), 'response':captcha_response}
+            r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=request_data)
+
+            # Ensure API Request was successful
+            if r.json()['success']:
+                # If score is greater than 0.5, user is probably not a bot
+                if r.json()['score'] >= 0.5:
+                    # Send the email
+                    try:
+                        form_sent = True               
+                        send_mail(subject, message, from_email, ['admin@thefreeguide.org'], fail_silently=False)
+                    except BadHeaderError:
+                        form_sent = False
+                        return HttpResponse('Invalid header found.')
+                # If score is less than 0.5 we got a bot boys! Get 'em!
+                else:
+                    form_sent = False
+            # If the API request was bad for some reason
+            else:
+                form_sent = False
+            if form_sent:
+                messages.add_message(request, messages.INFO, 'success')
+            else:
+                messages.add_message(request, messages.ERROR, 'failure')
+            return HttpResponseRedirect(request.path_info)
     origin = request.GET.get('locations')
 
     if service in var_map:
@@ -407,7 +456,8 @@ def details(request, service=None, event_id=None):
             'id': event_id,
             'service': service,
             'origin': origin,
-            'api_key': get_google_api_key()
+            'api_key': get_google_api_key(),
+            'contact_form': form
         })
 
 
