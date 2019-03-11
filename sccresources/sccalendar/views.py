@@ -404,7 +404,7 @@ def details(request, service=None, event_id=None):
             r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=request_data)
 
             # Ensure API Request was successful
-            if r.json()['success'] is True:
+            if r.json()['success']:
                 # If score is greater than 0.5, user is probably not a bot
                 if r.json()['score'] >= 0.5:
                     # Send the email
@@ -420,9 +420,9 @@ def details(request, service=None, event_id=None):
             # If the API request was bad for some reason
             else:
                 form_sent = False
-            if form_sent is True:
+            if form_sent:
                 messages.add_message(request, messages.INFO, 'success')
-            elif form_sent is False:
+            else:
                 messages.add_message(request, messages.ERROR, 'failure')
             return HttpResponseRedirect(request.path_info)
     origin = request.GET.get('locations')
