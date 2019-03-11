@@ -388,7 +388,6 @@ def details(request, service=None, event_id=None):
     """
     Renders the detail page for a given event id
     """
-    form_status = None
     #Email form handling
     if request.method == 'GET':
         form = ContactForm()
@@ -401,8 +400,8 @@ def details(request, service=None, event_id=None):
 
             # Perform API request with captcha token to verify
             captcha_response = form.data['g-recaptcha-response']
-            request_data = data = {'secret':get_google_captcha_private_credentials(), 'response':captcha_response}
-            r = requests.post('https://www.google.com/recaptcha/api/siteverify', data = request_data)
+            request_data = {'secret':get_google_captcha_private_credentials(), 'response':captcha_response}
+            r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=request_data)
 
             # Ensure API Request was successful
             if r.json()['success'] is True:
@@ -410,20 +409,20 @@ def details(request, service=None, event_id=None):
                 if r.json()['score'] >= 0.5:
                     # Send the email
                     try:
-                        form_status = True               
+                        form_sent = True               
                         send_mail(subject, message, from_email, ['admin@thefreeguide.org'], fail_silently=False)
                     except BadHeaderError:
-                        form_status = False
+                        form_sent = False
                         return HttpResponse('Invalid header found.')
                 # If score is less than 0.5 we got a bot boys! Get 'em!
                 else:
-                    form_status = False
+                    form_sent = False
             # If the API request was bad for some reason
             else:
-                form_status = False
-            if form_status is True:
+                form_sent = False
+            if form_sent is True:
                 messages.add_message(request, messages.INFO, 'success')
-            elif form_status is False:
+            elif form_sent is False:
                 messages.add_message(request, messages.ERROR, 'failure')
             return HttpResponseRedirect(request.path_info)
     origin = request.GET.get('locations')
@@ -458,8 +457,7 @@ def details(request, service=None, event_id=None):
             'service': service,
             'origin': origin,
             'api_key': get_google_api_key(),
-            'contact_form': form,
-            'form_status': form_status
+            'contact_form': form
         })
 
 
