@@ -1,10 +1,15 @@
+import os
 import random
 import logging
 from datetime import timedelta, datetime
 from urllib import parse
 
+from django.conf import settings
+from django.contrib import messages
+
 import phonenumbers
 import json
+import requests
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from googleapiclient.errors import HttpError as GoogleHttpError
@@ -372,14 +377,19 @@ def unsub_all(request):
         request, 'confirm.html', context={
             'message': 'you have been unsubscribed from all events'})
 
+def get_google_captcha_private_credentials():
+    """Return path to credentials or raise ValueError"""
+    try:
+        return os.environ['GOOGLE_CAPTCHA_PRIVATE_KEY']
+    except KeyError:
+        raise ValueError('Set GOOGLE_CAPTCHA_PRIVATE_KEY to allow Google captcha to function')
 
 def details(request, service=None, event_id=None):
     """
     Renders the detail page for a given event id
     """
-
+    form_status = None
     #Email form handling
-    form_status = False
     if request.method == 'GET':
         form = ContactForm()
     else:
@@ -388,12 +398,34 @@ def details(request, service=None, event_id=None):
             subject = form.cleaned_data['subject']
             from_email = form.cleaned_data['from_email']
             message = form.cleaned_data['message']
-            try:               
-                send_mail(subject, message, from_email, ['admin@thefreeguide.org'], fail_silently=False)
-                form_status = True
-            except BadHeaderError:
-                return HttpResponse('Invalid header found.')
 
+            # Perform API request with captcha token to verify
+            captcha_response = form.data['g-recaptcha-response']
+            request_data = data = {'secret':get_google_captcha_private_credentials(), 'response':captcha_response}
+            r = requests.post('https://www.google.com/recaptcha/api/siteverify', data = request_data)
+
+            # Ensure API Request was successful
+            if r.json()['success'] is True:
+                # If score is greater than 0.5, user is probably not a bot
+                if r.json()['score'] >= 0.5:
+                    # Send the email
+                    try:
+                        form_status = True               
+                        send_mail(subject, message, from_email, ['admin@thefreeguide.org'], fail_silently=False)
+                    except BadHeaderError:
+                        form_status = False
+                        return HttpResponse('Invalid header found.')
+                # If score is less than 0.5 we got a bot boys! Get 'em!
+                else:
+                    form_status = False
+            # If the API request was bad for some reason
+            else:
+                form_status = False
+            if form_status is True:
+                messages.add_message(request, messages.INFO, 'success')
+            elif form_status is False:
+                messages.add_message(request, messages.ERROR, 'failure')
+            return HttpResponseRedirect(request.path_info)
     origin = request.GET.get('locations')
 
     if service in var_map:

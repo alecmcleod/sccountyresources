@@ -1,7 +1,6 @@
 
 from django import forms
 from phonenumber_field.formfields import PhoneNumberField
-from snowpenguin.django.recaptcha3.fields import ReCaptchaField
 
 
 class SearchForm(forms.Form):
@@ -84,4 +83,3 @@ class ContactForm(forms.Form):
     from_email = forms.EmailField(required=True)
     subject = forms.CharField(required=True)
     message = forms.CharField(widget=forms.Textarea, required=True)
-    #captcha = ReCaptchaField()

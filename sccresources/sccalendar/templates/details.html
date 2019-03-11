@@ -16,12 +16,24 @@
           <h3>{{location}}</h3>
           <p>{{description}}</p>
           <div id="contact">Is this wrong?</div>
+
+          {% if messages %}
+            {% for message in messages %}
+              {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                <div class="alert alert-success" role="alert"><strong>Thank you!</strong> We got your message, we'll look into it.</div>
+              {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                <div class="alert alert-danger" role="alert"><strong>Uh oh!</strong> For some reason your message didn\'t get through, try again or email admin@thefreeguide.org</div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
           <div id="contactForm">
               <h1>Is this wrong?</h1>
               <small>Let us know! We'll look into it and fix it as soon as possible</small>
             <form action="?" method="POST">
               {% csrf_token %}
               {{ contact_form }}
+              <input type="hidden" class="django-recaptcha-hidden-field" name="g-recaptcha-response">
               <input class="formBtn" type="submit" />
             </form>
           </div>

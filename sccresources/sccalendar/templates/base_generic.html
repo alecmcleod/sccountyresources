@@ -1,4 +1,3 @@
-{% load recaptcha3 %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -28,8 +27,18 @@
   <link rel="icon" href="{% static 'img/Santa_Cruz_County.ico' %}">
   <script src="{% static 'js/index.js' %}"></script>
 
-  {% recaptcha_init %}
-  {% recaptcha_ready action_name='homepage' %}
+  <script src='https://www.google.com/recaptcha/api.js?render={{CAPTCHA_PUBLIC_KEY}}'></script>
+
+  <script>
+    grecaptcha.ready(function() {
+      grecaptcha.execute('{{CAPTCHA_PUBLIC_KEY}}', {action: 'homepage'}).then(function(token) {
+        document.querySelectorAll('input.django-recaptcha-hidden-field').forEach(function (value) {
+          value.value = token;
+        });
+      return token;
+      })
+    });
+  </script>
   
 </head>
 
