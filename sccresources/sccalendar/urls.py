@@ -13,4 +13,5 @@ urlpatterns = [
     path('confirm/', views.subscribe, name='confirm'),
     path('confirm/result/', views.confirm, name='result'),
     path('cancel/', views.unsubscribe, name='ubsubscribe'),
+    path('faq/', views.faq, name='FAQ'),
 ]

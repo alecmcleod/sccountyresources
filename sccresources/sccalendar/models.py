@@ -12,6 +12,13 @@ class Number(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     number = models.CharField(max_length=13)
 
+class FAQ(models.Model):
+    question = models.CharField(max_length=200, help_text='The Frequently Asked Question')
+    answer = models.TextField(help_text='Answer to the question')
+
+    def __str__(self):
+        return self.question
+
 class StaticEvent(models.Model):
     """ Defines non-changing events that can be displayed as a list"""
 

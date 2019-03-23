@@ -1,0 +1,33 @@
+{% extends "base_generic.html" %} 
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-md-10">
+        <section class="accordion-section clearfix mt-3" aria-label="Question Accordions">
+            <div class="container">
+                <h2>Frequently Asked Questions </h2>
+                {% for faq in faqs %}
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-default">
+                    <div class="panel-heading mb-3" role="tab" id="heading{{ forloop.counter0 }}">
+                        <h3 class="panel-title">
+                        <a class="collapsed" role="button" title="" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter0 }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter0 }}">
+                            {{faq.question}}
+                        </a>
+                        </h3>
+                    </div>
+                    <div id="collapse{{ forloop.counter0 }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ forloop.counter0 }}">
+                        <div class="panel-body px-3 mb-4">
+                        {{faq.answer}}
+                        </div>
+                    </div>
+                    </div>
+                    
+                </div>
+            {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+
+
+{% endblock %}

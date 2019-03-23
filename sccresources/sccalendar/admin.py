@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from sccalendar.models import FAQ, StaticEvent
 # Register your models here.
-from sccalendar.models import StaticEvent
 admin.site.register(StaticEvent)
+admin.site.register(FAQ)
