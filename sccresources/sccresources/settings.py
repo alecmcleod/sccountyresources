@@ -11,6 +11,18 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import pymysql  # noqa: 402
+
+
+def get_db_creds():
+    """Return database credentials or raise ValueError"""
+    try:
+        return (os.environ['FG_DB_USER'],
+                os.environ['FG_DB_PASSWORD'],
+                os.environ['FG_DB_NAME'],
+                os.environ.get('FG_DB_CONNECTION_NAME', None))
+    except KeyError:
+        raise ValueError('Set FG_DB_USER, FG_DB_PASSWORD and FG_DB_NAME to configure database access')
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -101,17 +113,48 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sccresources.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if os.environ.get('FG_SQLITE', 'false').lower() == 'true':
+    # Use sqlite DB. This is only useful for running test on Travis
+    # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else:
+    pymysql.install_as_MySQLdb()
+    db_user, db_password, db_name, db_connection_name = get_db_creds()
 
+    if os.getenv('GAE_APPLICATION', None):
+        # Running on production App Engine, so connect to Google Cloud SQL using
+        # the unix socket at /cloudsql/<your-cloudsql-connection string>
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.mysql',
+                'HOST': f'/cloudsql/{db_connection_name}',
+                'USER': db_user,
+                'PASSWORD': db_password,
+                'NAME': db_name,
+            }
+        }
+    else:
+        # Running locally so connect to either a local MySQL instance or connect to
+        # Cloud SQL via the proxy. To start the proxy via command line:
+        #
+        #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
+        #
+        # See https://cloud.google.com/sql/docs/mysql-connect-proxy
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.mysql',
+                'HOST': '127.0.0.1',
+                'PORT': '3306',
+                'USER': db_user,
+                'PASSWORD': db_password,
+                'NAME': db_name,
+            }
+        }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
