@@ -29,6 +29,8 @@ from .modules import sms
 from .modules.sms import (AlreadySubscribed, LessThanHour,
                           NullSubscriptionArgument)
 
+from sccalendar.models import FAQ
+
 logger = logging.getLogger(__name__)
 
 # Calendar ID variables
@@ -458,6 +460,14 @@ def details(request, service=None, event_id=None):
             'origin': origin,
             'api_key': get_google_api_key(),
             'contact_form': form
+        })
+
+def faq(request):
+    return render(
+        request,
+        'faq.html',
+        context={
+            'faqs': FAQ.objects.all()
         })
 
 
