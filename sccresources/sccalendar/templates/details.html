@@ -3,19 +3,23 @@
 <!--Based off of Start Bootstrap: Blog Post-->
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+<link rel="stylesheet" href="{% static 'css/print.css' %}" type="text/css" media="print">
     <!-- Page Content -->
     <div class="container">
-      <div class="row justify-content-md-center mt-3">
+      <div class="row justify-content-md-center mt-3 print">
         <div class="col-md-10">
+          <div id="print_share" class="donotprint">
+            <i class="fas fa-print" onclick="window.print();return false;"></i>
+          </div>
           <h1>{{title}}</h1>
         </div>
       </div>
-      <div class="row justify-content-md-center">
+      <div class="row justify-content-md-center print">
         <div class="col-md-5">
           <h2>{{date}} {{time}}</h2>
           <h3>{{location}}</h3>
           <p>{{description}}</p>
-          <div id="contact">Is this wrong?</div>
+          <div id="contact" class="donotprint">Is this wrong?</div>
 
           {% if messages %}
             {% for message in messages %}
@@ -26,8 +30,7 @@
               {% endif %}
             {% endfor %}
           {% endif %}
-
-          <div id="contactForm">
+          <div id="contactForm" class="donotprint">
               <h1>Is this wrong?</h1>
               <small>Let us know! We'll look into it and fix it as soon as possible</small>
             <form action="?" method="POST">
@@ -78,5 +81,15 @@
         </div>
       </div>
     </div>
+    <footer style="visibility:hidden;" class="print">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <p class="copyright text-muted">Copyright &copy; The Free Guide 2018 a 501(c)(3) Non-Profit</p>
+            <p class="copyright text-muted">Printed from TheFreeGuide.org</p>
+          </div>
+        </div>
+      </div>
+    </footer>
 
 {% endblock %}
