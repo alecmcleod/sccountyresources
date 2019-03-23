@@ -7,7 +7,7 @@ import phonenumber_field.modelfields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sccalendar', '0001_initial'),
+        ('sccalendar', '0002_faq'),
     ]
 
     operations = [
