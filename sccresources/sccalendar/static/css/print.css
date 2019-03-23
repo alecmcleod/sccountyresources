@@ -1,3 +1,3 @@
 body {visibility:hidden;}
-.print {visibility:visible;}
-.donotprint {visibility:hidden;}
+.print {visibility:visible !important;}
+.donotprint {visibility:hidden !important;}
