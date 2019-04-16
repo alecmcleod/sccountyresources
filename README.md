@@ -8,6 +8,8 @@
 
 <!-- <img src="https://www.ticketsnipers.com/assets/images/article/Santa_Cruz.png" height=500x /> -->
 
+See our beta deployment: https://beta-deploy.appspot.com/
+
 ## Purpose
 ---
 Santa Cruz County Resources aims to solve the problem of having no center of information
@@ -17,8 +19,6 @@ others, and many of the services are only offered at certain times during the we
 days. SCCR will provide a calendar that will provide the closest and soonest service in a
 particular category. If you need food, you will be able to enter your location, and it will provide
 you with the soonest open soup kitchen or food bank near your location.
-<center>Sincerely,</center>
-<center>The Santa Cruz County Resources team</center>
 
 ## Contents of the [Wiki](https://github.com/alecmcleod/sccountyresources/wiki/)
 ---
