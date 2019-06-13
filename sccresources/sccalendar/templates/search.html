@@ -12,7 +12,7 @@
                 </h2>
                 <h4 class="post-subtitle">
                 {% if event.description %}
-                {{event.description}}
+                {{event.description|truncatechars:100}}
                 {% endif %}
                 </h4>
             </a>
