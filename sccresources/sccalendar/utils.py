@@ -13,7 +13,8 @@ def to_sent(abbrv_string):
         'TH': 'Thursday',
         'FR': 'Friday',
         'SA': 'Saturday',
-        'SU': 'Sunday'}
+        'SU': 'Sunday'
+    }
 
     abbrv_list = abbrv_string.split(",")
 
@@ -68,3 +69,25 @@ pacific_tz = pytz.timezone('US/Pacific')
 def get_tz():
     """Return the pacific time timezone"""
     return pacific_tz
+
+
+def format_event_data(event):
+    event.location = shorten_location(event.location)
+    event.time_text = trim_event_time(event.time_text)
+    return event
+
+
+def trim_event_time(time_str):
+    # Remove leading zeros from any word in string
+    return ' '.join([word[1:] if word.startswith('0') else word for word in time_str.split()])
+
+
+def shorten_location(location):
+    try:
+        trim_from = location.index(', CA')
+    except (ValueError, AttributeError):
+        pass
+    else:
+        location = location[:trim_from]
+    return location
+

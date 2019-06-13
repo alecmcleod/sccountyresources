@@ -19,7 +19,7 @@ from urllib.request import urlopen
 
 from django.core.mail import send_mail, BadHeaderError
 
-from .utils import get_tz
+from .utils import get_tz, format_event_data, shorten_location
 from .google_credentials_auth import get_google_api_key
 from . import google_credentials_auth, models
 from .forms import ConfirmForm, SearchForm, ContactForm
@@ -184,13 +184,13 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
     if day_events:
         for event in day_events:
             # Geocode event location and check to make sure it gets a correct result. If not, pass to array as if it did not have address
-            if event.location != None:
-                url="https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (event.location, key)
+            if event.location is not None:
+                url = "https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (event.location, key)
                 url = url.replace(" ", "+")
                 response = urlopen(url)
                 jsongeocode = response.read()
                 jsongeocode = json.loads(jsongeocode)
-                if(jsongeocode['status'] == "OK"):
+                if jsongeocode['status'] == "OK":
                     event.latlng = [jsongeocode['results'][0]['geometry']['location']['lat'], jsongeocode['results'][0]['geometry']['location']['lng']]
                 else:
                     logger.error("Was unable to geocode event %s, api status was %s", event.summary, jsongeocode['status'])
@@ -199,6 +199,8 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
             else:
                 event.latlng = "NO_ADDRESS"
 
+    if day_events:
+        day_events = [format_event_data(event) for event in day_events]
 
     # Create variables defining the next day and previous day
     time_next = time_min + timedelta(days=1)
@@ -379,6 +381,7 @@ def unsub_all(request):
         request, 'confirm.html', context={
             'message': 'you have been unsubscribed from all events'})
 
+
 def get_google_captcha_private_credentials():
     """Return path to credentials or raise ValueError"""
     try:
@@ -386,11 +389,12 @@ def get_google_captcha_private_credentials():
     except KeyError:
         raise ValueError('Set GOOGLE_CAPTCHA_PRIVATE_KEY to allow Google captcha to function')
 
+
 def details(request, service=None, event_id=None):
     """
     Renders the detail page for a given event id
     """
-    #Email form handling
+    # Email form handling
     if request.method == 'GET':
         form = ContactForm()
     else:
@@ -450,7 +454,7 @@ def details(request, service=None, event_id=None):
         'details.html',
         context={
             'title': event.summary,
-            'location': event.location,
+            'location': shorten_location(event.location),
             'description': event.description,
             'date': event.start_datetime.date,
             'time': event.start_datetime.time,
