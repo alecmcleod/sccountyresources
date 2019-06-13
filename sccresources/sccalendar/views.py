@@ -29,7 +29,7 @@ from .modules import sms
 from .modules.sms import (AlreadySubscribed, LessThanHour,
                           NullSubscriptionArgument)
 
-from sccalendar.models import FAQ
+from sccalendar.models import FAQ, Category, Area, StaticEvent
 
 logger = logging.getLogger(__name__)
 
@@ -468,6 +468,29 @@ def faq(request):
         'faq.html',
         context={
             'faqs': FAQ.objects.all()
+        })
+
+def events(request):
+    #Retrieve complete lists of possible categories and areas (Shelter, Food / Santa Cruz, Watsonville)
+    event_categories = Category.objects.all()
+    event_areas = Area.objects.all()
+    area_data = []
+    category_data = []
+
+    #The outside list is areas
+    for event_area in event_areas:
+        #Next is categories
+        for event_category in event_categories:
+            #Each category list contains all the events in that category in the parent lists area
+            category_data.append(StaticEvent.objects.filter(category__exact=event_category).filter(area__exact=event_area))
+        area_data.append(category_data)
+        #Clear the list for variable re-use
+        category_data = []
+    return render(
+        request,
+        'events.html',
+        context={
+            'event_data': area_data
         })
 
 
