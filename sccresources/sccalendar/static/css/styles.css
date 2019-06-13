@@ -98,7 +98,7 @@ img::-moz-selection {
   border-bottom: 1px solid #e9ecef;
   background-color: white;
   font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  z-index: 0;
+  z-index: 4;
 }
 
 #mainNav .navbar-brand {
