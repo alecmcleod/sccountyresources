@@ -471,11 +471,48 @@ def faq(request):
         })
 
 def contact_us(request):
+    #Email form handling
+    if request.method == 'GET':
+        form = ContactForm()
+    else:
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            from_email = form.cleaned_data['from_email']
+            message = form.cleaned_data['message']
+
+            # Perform API request with captcha token to verify
+            captcha_response = form.data['g-recaptcha-response']
+            request_data = {'secret':get_google_captcha_private_credentials(), 'response':captcha_response}
+            r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=request_data)
+
+            # Ensure API Request was successful
+            if r.json()['success']:
+                # If score is greater than 0.5, user is probably not a bot
+                if r.json()['score'] >= 0.5:
+                    # Send the email
+                    try:
+                        form_sent = True               
+                        send_mail(subject, message, from_email, ['admin@thefreeguide.org'], fail_silently=False)
+                    except BadHeaderError:
+                        form_sent = False
+                        return HttpResponse('Invalid header found.')
+                # If score is less than 0.5 we got a bot boys! Get 'em!
+                else:
+                    form_sent = False
+            # If the API request was bad for some reason
+            else:
+                form_sent = False
+            if form_sent:
+                messages.add_message(request, messages.INFO, 'success')
+            else:
+                messages.add_message(request, messages.ERROR, 'failure')
+            return HttpResponseRedirect(request.path_info)
     return render(
         request,
         'contact_us.html',
         context={
-            
+            'contact_form': form
         })
 
 

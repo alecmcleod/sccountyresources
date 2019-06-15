@@ -1,5 +1,53 @@
 {% extends "base_generic.html" %} {% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/contact.css' %}">
 
-<p> ERROR 404: page not found </p>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5 text_center">
+            {% if messages %}
+                {% for message in messages %}
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                    <br>
+                    <div class="alert alert-success" role="alert"><strong>Thank you!</strong> We got your message, we'll look into it.</div>
+                {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                    <br>
+                    <div class="alert alert-danger" role="alert"><strong>Uh oh!</strong> For some reason your message didn't get through, try again or email admin@thefreeguide.org</div>
+                {% endif %}
+                {% endfor %}
+            {% endif %}
+            
+            <h1>Contact us!</h1>
+            <small>Do you have a suggestion for a service to add? A correction to a service we already
+                have? Are you interested in volunteering with us? Or do you just want to say hi? Fill out
+                the form below and we'll get back to you as soon as possible. 
+            </small>
+            <form action="?" method="POST" class="text-center">
+                {% csrf_token %}
+                {{ contact_form }}
+                <input type="hidden" class="django-recaptcha-hidden-field" name="g-recaptcha-response">
+                <input class="formBtn" type="submit" />
+            </form>
+            
+            <script>
+                $(function() {
+                // contact form animations
+                $('#contact').click(function() {
+                    $('#contactForm').fadeToggle();
+                })
+                $(document).mouseup(function (e) {
+                    var container = $("#contactForm");
+
+                    if (!container.is(e.target) // if the target of the click isn't the container...
+                        && container.has(e.target).length === 0) // ... nor a descendant of the container
+                    {
+                        container.fadeOut();
+                    }
+                });              
+                });
+            </script>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
