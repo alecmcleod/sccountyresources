@@ -191,9 +191,13 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
                 jsongeocode = response.read()
                 jsongeocode = json.loads(jsongeocode)
                 if jsongeocode['status'] == "OK":
-                    event.latlng = [jsongeocode['results'][0]['geometry']['location']['lat'], jsongeocode['results'][0]['geometry']['location']['lng']]
+                    event.latlng = [
+                        jsongeocode['results'][0]['geometry']['location']['lat'],
+                        jsongeocode['results'][0]['geometry']['location']['lng']
+                    ]
                 else:
-                    logger.error("Was unable to geocode event %s, api status was %s", event.summary, jsongeocode['status'])
+                    logger.error("Was unable to geocode event %s, api status was %s",
+                                 event.summary, jsongeocode['status'])
                     event.location = None
                     event.latlng = "NO_ADDRESS"
             else:
@@ -211,12 +215,15 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
     return render(
         request,
         'search.html',
-        context={'origin': request.GET.get('locations', ''),
-                 'service': request.GET.get('services'),
-                 'day_events': day_events,
-                 'day_name': day_name,
-                 'next_date': time_next_date,
-                 'prev_date': time_prev_date}
+        context={
+            'origin': request.GET.get('locations', ''),
+            'service': request.GET.get('services'),
+            'day_events': day_events,
+            'day_name': day_name,
+            'next_date': time_next_date,
+            'prev_date': time_prev_date,
+            'maps_key': get_google_api_key()
+        }
     )
 
 
@@ -491,7 +498,7 @@ def events(request):
             data_to_add = StaticEvent.objects.filter(category__exact=event_category).filter(area__exact=event_area)
             if data_to_add:
                 category_data.append(data_to_add)
-                
+
         area_data.append(category_data)
     return render(
         request,
