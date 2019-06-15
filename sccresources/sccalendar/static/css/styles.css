@@ -179,6 +179,7 @@ img::-moz-selection {
     /* if the user changes the scrolling direction, we show the header */
     -webkit-transform: translate3d(0, 100%, 0);
     transform: translate3d(0, 100%, 0);
+    background: #fff;
   }
 }
 
