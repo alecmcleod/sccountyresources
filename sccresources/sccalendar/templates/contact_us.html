@@ -4,7 +4,7 @@
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-5 text_center">
+        <div class="col-md-6 text_center">
             {% if messages %}
                 {% for message in messages %}
                 {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
@@ -16,12 +16,16 @@
                 {% endif %}
                 {% endfor %}
             {% endif %}
-            
-            <h1>Contact us!</h1>
-            <small>Do you have a suggestion for a service to add? A correction to a service we already
-                have? Are you interested in volunteering with us? Or do you just want to say hi? Fill out
-                the form below and we'll get back to you as soon as possible. 
-            </small>
+            <br>
+            <div class="card">
+                <div class="card-body text-center">
+                    <h1>Contact us!</h1>
+                    <small>Do you have a suggestion for a service to add? A correction to a service we already
+                        have? Are you interested in volunteering with us? Or do you just want to say hi? Fill out
+                        the form below and we'll get back to you as soon as possible. 
+                    </small>
+                </div>
+            </div>
             <form action="?" method="POST" class="text-center">
                 {% csrf_token %}
                 {{ contact_form }}
