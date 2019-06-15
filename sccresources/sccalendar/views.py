@@ -486,7 +486,10 @@ def events(request):
         #Next is categories
         for event_category in event_categories:
             #Each category list contains all the events in that category in the parent lists area
-            category_data.append(StaticEvent.objects.filter(category__exact=event_category).filter(area__exact=event_area))
+            data_to_add = StaticEvent.objects.filter(category__exact=event_category).filter(area__exact=event_area)
+            if data_to_add:
+                category_data.append(data_to_add)
+                
         area_data.append(category_data)
         #Clear the list for variable re-use
         category_data = []

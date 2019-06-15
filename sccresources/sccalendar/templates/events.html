@@ -2,7 +2,22 @@
 {% block content %}
 <div class="row justify-content-md-center">
     <div class="col-md-10">
-        {% for area in event_data %}    
+        <br>
+        <div class="card">
+            <div class="card-body">
+                <strong>View services available in:</strong> 
+                {% for area in event_data %}
+                    {% if forloop.last %}
+                        <a href="#{{forloop.counter}}">{{area.0.0.area}}</a>
+                    {% else %}
+                        <a href="#{{forloop.counter}}">{{area.0.0.area}}</a> | 
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        {% for area in event_data %}
+            <a name="{{forloop.counter}}"></a>    
             {% for category in area %}
                 {% if forloop.first %}
                 <h1>{{area.0.0.area}}</h1>
