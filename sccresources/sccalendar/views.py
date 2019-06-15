@@ -470,6 +470,14 @@ def faq(request):
             'faqs': FAQ.objects.all()
         })
 
+def contact_us(request):
+    return render(
+        request,
+        'contact_us.html',
+        context={
+            
+        })
+
 
 def event_ical_download(request, service=None, event_id=None):
     """
