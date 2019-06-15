@@ -1,5 +1,4 @@
 from django.db import models
-from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Event(models.Model):
@@ -26,9 +25,13 @@ class StaticEvent(models.Model):
     event_name = models.CharField(max_length=100, help_text='Enter event name')
     event_details = models.CharField(max_length=200, help_text='Enter event details (times ect.)', blank=True, null=True)
     event_address = models.CharField(max_length=200, blank=True, null=True, help_text='Enter event address')
-    event_phone = PhoneNumberField(blank=True, null=True)
+    event_phone = models.CharField(max_length=40, blank=True, null=True, help_text='Enter phone number')
     event_email = models.EmailField(blank=True, null=True)
     event_url = models.URLField(max_length=200, blank=True, null=True)
+
+    area = models.ForeignKey('Area', on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
+
 
     # Metadata
     class meta:
@@ -38,3 +41,18 @@ class StaticEvent(models.Model):
     def __str__(self):
         return self.event_name
 
+class Area(models.Model):
+    """Model representing an area for a static event e.g. Santa Cruz or Watsonville"""
+    name = models.CharField(max_length=200, help_text='Enter the area name')
+
+    def __str__(self):
+        """String for representing the Model object"""
+        return self.name
+
+class Category(models.Model):
+    """Model representing a category for a static event e.g. Shelter, Food"""
+    name = models.CharField(max_length=200, help_text='Enter the category title')
+
+    def __str__(self):
+        """String for representing the Model object"""
+        return self.name
