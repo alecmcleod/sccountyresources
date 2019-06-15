@@ -24,32 +24,35 @@
                         have? Are you interested in volunteering with us? Or do you just want to say hi? Fill out
                         the form below and we'll get back to you as soon as possible. 
                     </small>
+                
+                    <form action="?" method="POST" class="text-center">
+                        <br>
+                        {% csrf_token %}
+                        {{ contact_form }}
+                        <input type="hidden" class="django-recaptcha-hidden-field" name="g-recaptcha-response">
+                        <input class="formBtn" type="submit" />
+                    </form>
+                    
+                    <script>
+                        $(function() {
+                        // contact form animations
+                        $('#contact').click(function() {
+                            $('#contactForm').fadeToggle();
+                        })
+                        $(document).mouseup(function (e) {
+                            var container = $("#contactForm");
+
+                            if (!container.is(e.target) // if the target of the click isn't the container...
+                                && container.has(e.target).length === 0) // ... nor a descendant of the container
+                            {
+                                container.fadeOut();
+                            }
+                        });              
+                        });
+                    </script>
                 </div>
             </div>
-            <form action="?" method="POST" class="text-center">
-                {% csrf_token %}
-                {{ contact_form }}
-                <input type="hidden" class="django-recaptcha-hidden-field" name="g-recaptcha-response">
-                <input class="formBtn" type="submit" />
-            </form>
-            
-            <script>
-                $(function() {
-                // contact form animations
-                $('#contact').click(function() {
-                    $('#contactForm').fadeToggle();
-                })
-                $(document).mouseup(function (e) {
-                    var container = $("#contactForm");
-
-                    if (!container.is(e.target) // if the target of the click isn't the container...
-                        && container.has(e.target).length === 0) // ... nor a descendant of the container
-                    {
-                        container.fadeOut();
-                    }
-                });              
-                });
-            </script>
+            <br>
         </div>
     </div>
 </div>
