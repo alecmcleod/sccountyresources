@@ -27,7 +27,7 @@ def get_google_api_key(dest):
         raise ValueError("dest must be 'server' or 'client'")
     try:
         # For local deployment, only one key needs to be used
-        return os.environ[f'GOOGLE_MAPS_KEY']
+        return os.environ['GOOGLE_MAPS_KEY']
     except KeyError:
         pass
     try:
