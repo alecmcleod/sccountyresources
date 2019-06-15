@@ -9,7 +9,7 @@
                 {% for message in messages %}
                 {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
                     <br>
-                    <div class="alert alert-success" role="alert"><strong>Thank you!</strong> We got your message, we'll look into it.</div>
+                    <div class="alert alert-success" role="alert"><strong>Thank you!</strong> We got your message, we'll get back to you soon!</div>
                 {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
                     <br>
                     <div class="alert alert-danger" role="alert"><strong>Uh oh!</strong> For some reason your message didn't get through, try again or email admin@thefreeguide.org</div>
