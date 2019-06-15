@@ -180,7 +180,7 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
                   'singleEvents': True,
                   'orderBy': "startTime"}
     day_events = api_call(services, locations, api_params)
-    key = get_google_api_key()
+    key = get_google_api_key('server')
     if day_events:
         for event in day_events:
             # Geocode event location and check to make sure it gets a correct result. If not, pass to array as if it did not have address
@@ -222,7 +222,7 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
             'day_name': day_name,
             'next_date': time_next_date,
             'prev_date': time_prev_date,
-            'maps_key': get_google_api_key()
+            'maps_key': get_google_api_key('client')
         }
     )
 
@@ -469,7 +469,7 @@ def details(request, service=None, event_id=None):
             'id': event_id,
             'service': service,
             'origin': origin,
-            'api_key': get_google_api_key(),
+            'api_key': get_google_api_key('client'),
             'contact_form': form
         })
 
