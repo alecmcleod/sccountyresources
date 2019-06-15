@@ -466,6 +466,7 @@ def details(request, service=None, event_id=None):
             'contact_form': form
         })
 
+
 def faq(request):
     return render(
         request,
@@ -474,25 +475,24 @@ def faq(request):
             'faqs': FAQ.objects.all()
         })
 
+
 def events(request):
-    #Retrieve complete lists of possible categories and areas (Shelter, Food / Santa Cruz, Watsonville)
+    # Retrieve complete lists of possible categories and areas (Shelter, Food / Santa Cruz, Watsonville)
     event_categories = Category.objects.all()
     event_areas = Area.objects.all()
     area_data = []
-    category_data = []
 
-    #The outside list is areas
+    # The outside list is areas
     for event_area in event_areas:
-        #Next is categories
+        # Next is categories
+        category_data = []
         for event_category in event_categories:
-            #Each category list contains all the events in that category in the parent lists area
+            # Each category list contains all the events in that category in the parent lists area
             data_to_add = StaticEvent.objects.filter(category__exact=event_category).filter(area__exact=event_area)
             if data_to_add:
                 category_data.append(data_to_add)
                 
         area_data.append(category_data)
-        #Clear the list for variable re-use
-        category_data = []
     return render(
         request,
         'events.html',
