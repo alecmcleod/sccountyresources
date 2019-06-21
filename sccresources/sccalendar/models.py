@@ -1,4 +1,5 @@
 from django.db import models
+from djrichtextfield.models import RichTextField
 
 
 class Event(models.Model):
@@ -13,7 +14,7 @@ class Number(models.Model):
 
 class FAQ(models.Model):
     question = models.CharField(max_length=200, help_text='The Frequently Asked Question')
-    answer = models.TextField(help_text='Answer to the question')
+    answer = RichTextField(help_text='Answer to the question')
 
     def __str__(self):
         return self.question

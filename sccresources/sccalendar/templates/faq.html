@@ -17,7 +17,7 @@
                     </div>
                     <div id="collapse{{ forloop.counter0 }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ forloop.counter0 }}">
                         <div class="panel-body px-3 mb-4">
-                        {{faq.answer}}
+                        {{faq.answer | safe}}
                         </div>
                     </div>
                     </div>

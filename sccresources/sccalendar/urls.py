@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.conf.urls import include
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -16,4 +17,5 @@ urlpatterns = [
     path('faq/', views.faq, name='FAQ'),
     path('events/', views.events, name="events"),
     path('contactus/', views.contact_us, name="contact_us"),
+    path('djrichtextfield/', include('djrichtextfield.urls')),
 ]
