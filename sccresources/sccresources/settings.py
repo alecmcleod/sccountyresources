@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'sccalendar.apps.SccalendarConfig',
     'addressbook.apps.AddressbookConfig',
+    'djrichtextfield',
 ]
 
 MIDDLEWARE = [
@@ -179,6 +180,17 @@ EMAIL_HOST_USER = 'thefreeguide'
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_PASSWORD', 'default')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+DJRICHTEXTFIELD_CONFIG = {
+    'js': ['//tinymce.cachefly.net/4.1/tinymce.min.js'],
+    'init_template': 'djrichtextfield/init/tinymce.js',
+    'settings': {
+        'menubar': False,
+        'plugins': 'link image',
+        'toolbar': 'bold italic | link image | removeformat',
+        'width': 700
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
