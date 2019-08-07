@@ -8,7 +8,7 @@
 
 <!-- <img src="https://www.ticketsnipers.com/assets/images/article/Santa_Cruz.png" height=500x /> -->
 
-See our beta deployment: https://beta-deploy.appspot.com/
+Deployed live at http://santacruzfreeguide.org!
 
 ## Purpose
 ---
