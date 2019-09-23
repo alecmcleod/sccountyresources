@@ -10,6 +10,7 @@ from django.contrib import messages
 import phonenumbers
 import json
 import requests
+import unicodedata
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from googleapiclient.errors import HttpError as GoogleHttpError
@@ -117,6 +118,9 @@ def calendars(request):
         context={'is_mobile': is_mobile}
     )
 
+def remove_control_characters(s):
+    return "".join(ch for ch in s if unicodedata.category(ch)[0]!="C")
+
 def search_day_noncomplete(request):
     now = datetime.now()
     return search(request, now.year, now.month, now.day, 'day')
@@ -185,7 +189,7 @@ def search(request, year=None, month=None, day=None, timespan=None):  # noqa: C9
         for event in day_events:
             # Geocode event location and check to make sure it gets a correct result. If not, pass to array as if it did not have address
             if event.location is not None:
-                url = "https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (event.location, key)
+                url = "https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (remove_control_characters(event.location), key)
                 url = url.replace(" ", "+")
                 response = urlopen(url)
                 jsongeocode = response.read()
