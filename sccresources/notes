@@ -1,0 +1,18 @@
+Notes:
+
+
+action items:
+- alec and I need to port over stuff from wix site
+- we need descriptions for kinds of calendars
+- make FAQ
+- make contact us work
+- add print page button
+
+- connect with ucsc volunteer resources
+
+STATUS WITH DATABASE:
+- add instructions for dev setup:
+  - download google proxy thingy
+  - set environment variables for database (connectionName,
+    username, and password).
+
