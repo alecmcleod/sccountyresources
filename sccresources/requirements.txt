@@ -10,7 +10,7 @@ google-auth-httplib2==0.0.3
 googlemaps==2.5.1
 gunicorn==19.9.0
 # maybe order matters for these next two
-urllib3[secure]==1.24.1
+urllib3[secure]==1.24.2
 httplib2shim==0.0.3
 icalendar==4.0.1
 phonenumbers==8.9.6
